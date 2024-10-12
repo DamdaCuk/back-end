@@ -1,4 +1,4 @@
-package com.damda;
+package com.cuk.damda;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class DamdaApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(DamdaApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(DamdaApplication.class, args);
+	}
 
 }
