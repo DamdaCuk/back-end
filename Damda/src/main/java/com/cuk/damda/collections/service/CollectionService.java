@@ -1,4 +1,4 @@
-package com.cuk.damda.colllections.service;
+package com.cuk.damda.collections.service;
 
 public interface CollectionService {
 }

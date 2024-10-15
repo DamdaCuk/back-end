@@ -1,7 +1,7 @@
-package com.cuk.damda.colllections.domain;
+package com.cuk.damda.collections.domain;
 
-import com.cuk.damda.colllections.domain.Enum.ItemType;
-import com.cuk.damda.colllections.domain.Enum.Rating;
+import com.cuk.damda.collections.domain.Enum.ItemType;
+import com.cuk.damda.collections.domain.Enum.Rating;
 import com.cuk.damda.global.domain.BaseEntity;
 import com.cuk.damda.home.domain.Home;
 import jakarta.persistence.*;

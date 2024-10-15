@@ -1,4 +1,4 @@
-package com.cuk.damda.colllections.domain.Enum;
+package com.cuk.damda.collections.domain.Enum;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

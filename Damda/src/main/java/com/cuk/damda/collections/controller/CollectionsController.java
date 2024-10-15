@@ -1,4 +1,4 @@
-package com.cuk.damda.colllections.controller;
+package com.cuk.damda.collections.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
