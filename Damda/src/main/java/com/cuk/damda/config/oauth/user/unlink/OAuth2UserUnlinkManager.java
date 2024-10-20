@@ -11,9 +11,9 @@ public class OAuth2UserUnlinkManager {
 
     private final NaverUserUnlink naverUserUnlink;
 
-    public void unlink(OAuth2Provider provider, String accessToken){
+    public void unlink(OAuth2Provider provider, String accessToken, String userEmail) {
         if(OAuth2Provider.NAVER.equals(provider)){
-            naverUserUnlink.unlink(accessToken);
+            naverUserUnlink.unlink(accessToken, userEmail);
         }else{
             throw new OAuth2AuthenticationProcessingException("Unlink with "+provider.getRegistrationId()+" is not supported");
         }

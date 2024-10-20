@@ -111,8 +111,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             String accessToken = principal.getUserInfo().getAccessToken();
             OAuth2Provider provider = principal.getUserInfo().getProvider();
+            String userEmail=principal.getUserInfo().getEmail();
 
-            oAuth2UserUnlinkManager.unlink(provider, accessToken);
+            oAuth2UserUnlinkManager.unlink(provider, accessToken, userEmail);
+
+            //토큰 삭제
+            CookieUtil.deleteCookie(request,response, REFRESH_TOKEN_COOKIE_NAME);
+            CookieUtil.deleteCookie(request,response, "access_token");
+
+            //인증 관련 설정값 제거
+            clearAuthenticationAttributes(request, response);
 
             return UriComponentsBuilder.fromUriString(targetUrl)
                     .build().toUriString();
