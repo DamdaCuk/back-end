@@ -1,8 +1,10 @@
 package com.cuk.damda.global.exception;
 
+import com.cuk.damda.config.oauth.exception.OAuth2AuthenticationProcessingException;
 import com.cuk.damda.global.controller.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -46,4 +48,20 @@ public class GlobalExceptionHandler {
                 null
         );
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(OAuth2AuthenticationProcessingException.class)
+    public ApiResponse<Object> oAuth2AuthenticationProcessingException(HandlerMethodValidationException e) {
+        String message = e.getAllErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        return ApiResponse.of(
+                HttpStatus.BAD_REQUEST,
+                message,
+                null
+        );
+    }
 }
+
+
