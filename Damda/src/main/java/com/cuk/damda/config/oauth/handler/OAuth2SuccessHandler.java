@@ -75,14 +75,19 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 
         if ("login".equalsIgnoreCase(mode)) {
-            log.info("email={}, name={}, accessToken={}",
+//            log.info("email={}, name={}, accessToken={}",
+//                    principal.getUserInfo().getEmail(),
+//                    principal.getUserInfo().getName(),
+//                    principal.getUserInfo().getAccessToken()
+//            );
+
+            memberService.saveMember(
                     principal.getUserInfo().getEmail(),
                     principal.getUserInfo().getName(),
-                    principal.getUserInfo().getAccessToken()
-            );
+                    principal.getUserInfo().getProvider().name());
 
             String accessToken = tokenProvider.makeToken(authentication);
-            String refreshToken = "test_refresh_token";
+            String refreshToken = "refresh_token";
 
             // 액세스 토큰을 쿠키에 저장
             addAccessTokenToCookie(request, response, accessToken);

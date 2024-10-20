@@ -23,33 +23,35 @@ public class Member extends BaseEntity implements UserDetails {
 
     private String email;
 
-    private String password;
-
     private String provider; //공급자
-    private String providerId; //공급 아이디
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "home_id", nullable = false)
+    @JoinColumn(name = "home_id") //null 허용(처음 계정을 만든 사용자)
     private Home home;
 
     @Builder
-    private Member(String username, String email, String password) {
+    private Member(String username, String email, String provider) {
         this.username = username;
         this.email = email;
-        this.password = password;
+        this.provider=provider;
     }
     
-    public static Member create(String username, String email, String password) {
+    public static Member create(String username, String email, String provider) {
         return Member.builder()
                 .username(username)
                 .email(email)
-                .password(password)
+                .provider(provider)
                 .build();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
+    }
+
+    @Override
+    public String getPassword() {
+        return ""; //일반 로그인 진행 X -> "" return 하도록
     }
 
     @Override

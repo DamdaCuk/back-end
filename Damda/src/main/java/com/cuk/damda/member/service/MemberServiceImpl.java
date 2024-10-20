@@ -2,6 +2,7 @@ package com.cuk.damda.member.service;
 
 import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.repository.MemberRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,5 +24,16 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(()->new IllegalArgumentException("Unexpected user"));
     }
 
+    @Override
+    public Member saveMember(String email, String name, String provider){
+        Optional<Member> existingMember = memberRepository.findByEmail(email);
+
+        Member member = null;
+        if(existingMember.isEmpty()) {
+            member=Member.create(name, email, provider);
+            memberRepository.save(member);
+        }
+        return member;
+    }
 
 }
