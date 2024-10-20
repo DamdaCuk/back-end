@@ -7,13 +7,16 @@ import com.cuk.damda.config.oauth.OAuth2UserPrincipal;
 import com.cuk.damda.config.oauth.OAuthAuthorizationRequestBasedOnCookieRepository;
 import com.cuk.damda.config.oauth.user.OAuth2Provider;
 import com.cuk.damda.config.oauth.user.unlink.OAuth2UserUnlinkManager;
+import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.service.MemberService;
+import com.cuk.damda.member.service.RefreshTokenService;
 import com.cuk.damda.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final TokenProvider tokenProvider;
     private final OAuthAuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
+    private final RefreshTokenService refreshTokenService;
     private final MemberService memberService;
     private final OAuth2UserUnlinkManager oAuth2UserUnlinkManager;
 
@@ -81,13 +85,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //                    principal.getUserInfo().getAccessToken()
 //            );
 
-            memberService.saveMember(
+            //로그인한 유져(멤버) DB에 저장
+            Member member=memberService.saveMember(
                     principal.getUserInfo().getEmail(),
                     principal.getUserInfo().getName(),
                     principal.getUserInfo().getProvider().name());
 
+
             String accessToken = tokenProvider.makeToken(authentication);
-            String refreshToken = "refresh_token";
+            String refreshToken = tokenProvider.makeRefreshToken(authentication);
+
+            //리프레시 토큰 DB에 저장
+            refreshTokenService.createRefreshToken(member, refreshToken, LocalDateTime.now());
 
             // 액세스 토큰을 쿠키에 저장
             addAccessTokenToCookie(request, response, accessToken);

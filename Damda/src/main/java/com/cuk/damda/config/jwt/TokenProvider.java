@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenProvider {
     private static final long ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS = 1000 * 60 * 30; // 30min
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14; //리프레시 토큰 만료 기간 : 14일
+
     private final JwtProperties jwtProperties;
     @Value("${jwt.secretKey}")
     private String secret;
@@ -42,8 +44,23 @@ public class TokenProvider {
         return Jwts.builder()
                 .setSubject(authentication.getName()) //email로 토큰 생성
                 .setIssuedAt(now)
+                .setIssuer(jwtProperties.getIssuer())
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS256) //이게 보안성 높아짐
+                .compact();
+    }
+
+    //리프레시 토큰 생성
+    public String makeRefreshToken(Authentication authentication){
+        Date now=new Date();
+        Date expiryDate=new Date(now.getTime()+REFRESH_TOKEN_EXPIRE_TIME);
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .setIssuedAt(now)
+                .setIssuer(jwtProperties.getIssuer())
+                .setExpiration(expiryDate)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
