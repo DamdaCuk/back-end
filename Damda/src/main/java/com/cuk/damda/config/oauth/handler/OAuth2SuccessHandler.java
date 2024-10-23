@@ -7,6 +7,7 @@ import com.cuk.damda.config.oauth.OAuth2UserPrincipal;
 import com.cuk.damda.config.oauth.OAuthAuthorizationRequestBasedOnCookieRepository;
 import com.cuk.damda.config.oauth.user.OAuth2Provider;
 import com.cuk.damda.config.oauth.user.unlink.OAuth2UserUnlinkManager;
+import com.cuk.damda.member.controller.dto.MemberDTO;
 import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.service.MemberService;
 import com.cuk.damda.member.service.RefreshTokenService;
@@ -14,9 +15,9 @@ import com.cuk.damda.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    public static final String REFRESH_TOKEN_COOKIE_NAME="refresh_token";
-    public static final Duration REFRESH_TOKEN_DURATION=Duration.ofDays(14);
     public static final Duration ACCESS_TOKEN_DURATION=Duration.ofDays(1);
-    public static final String REDIRECT_PATH="/articles";
 
     private final TokenProvider tokenProvider;
     private final OAuthAuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
@@ -47,13 +45,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         targetUrl = determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
-            logger.debug("Response has already been committed." + targetUrl);
             return;
         }
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
+    @Transactional
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) {
 
@@ -68,16 +66,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         OAuth2UserPrincipal principal = getOAuth2UserPrincipal(authentication);
 
-        log.info("Principal: {}", principal);
         if (principal == null) {
             return UriComponentsBuilder.fromUriString(targetUrl)
                     .queryParam("error", "Login failed")
                     .build().toUriString();
         }
 
-        log.info("mode={}", mode);
-
-
+        String email=authentication.getName();
         if ("login".equalsIgnoreCase(mode)) {
 //            log.info("email={}, name={}, accessToken={}",
 //                    principal.getUserInfo().getEmail(),
@@ -85,26 +80,28 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //                    principal.getUserInfo().getAccessToken()
 //            );
 
-            //로그인한 유져(멤버) DB에 저장
-            Member member=memberService.saveMember(
-                    principal.getUserInfo().getEmail(),
-                    principal.getUserInfo().getName(),
-                    principal.getUserInfo().getProvider().name());
+            MemberDTO memberDTO=memberService.findByEmail(email); //회원가입 여부 확인
+            if(memberDTO==null) {
+                //로그인한 유저(멤버) DB에 저장
+                Member member = memberService.saveMember( //회원가입 진행
+                        principal.getUserInfo().getEmail(),
+                        principal.getUserInfo().getName(),
+                        principal.getUserInfo().getProvider().name());
+                memberDTO=MemberDTO.toDTO(member);
+            }
+            Long userId=memberDTO.getUserId();
 
+            String accessToken = tokenProvider.makeToken(authentication, userId);
+            String refreshToken = tokenProvider.makeRefreshToken(authentication, userId);
 
-            String accessToken = tokenProvider.makeToken(authentication);
-            String refreshToken = tokenProvider.makeRefreshToken(authentication);
-
-            //리프레시 토큰 DB에 저장
-            refreshTokenService.createRefreshToken(member, refreshToken, LocalDateTime.now());
+            //리프레시 토큰 레디스에 저장
+            refreshTokenService.createRefreshToken(memberDTO, refreshToken, accessToken);
 
             // 액세스 토큰을 쿠키에 저장
             addAccessTokenToCookie(request, response, accessToken);
-            addRefreshTokenToCookie(request, response, refreshToken);
 
             return UriComponentsBuilder.fromUriString(targetUrl)
                     .queryParam("access_token", accessToken)
-                    .queryParam("refresh_token", refreshToken)
                     .build().toUriString();
 
         } else if ("unlink".equalsIgnoreCase(mode)) {
@@ -113,11 +110,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             OAuth2Provider provider = principal.getUserInfo().getProvider();
             String userEmail=principal.getUserInfo().getEmail();
 
-            oAuth2UserUnlinkManager.unlink(provider, accessToken, userEmail);
-
-            //토큰 삭제
-            CookieUtil.deleteCookie(request,response, REFRESH_TOKEN_COOKIE_NAME);
-            CookieUtil.deleteCookie(request,response, "access_token");
+            oAuth2UserUnlinkManager.unlink(provider, accessToken, userEmail, request, response);
 
             //인증 관련 설정값 제거
             clearAuthenticationAttributes(request, response);
@@ -133,7 +126,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private OAuth2UserPrincipal getOAuth2UserPrincipal(Authentication authentication) {
         Object principal = authentication.getPrincipal();
-        log.info("principal={}", principal);
 
         if (principal instanceof OAuth2UserPrincipal) {
             return (OAuth2UserPrincipal) principal;
@@ -147,25 +139,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
     }
 
-    // 생성된 리프레시 토큰을 쿠키에 저장
-    private void addRefreshTokenToCookie(HttpServletRequest request, HttpServletResponse response, String refreshToken){
-        int cookieMaxAge = (int) REFRESH_TOKEN_DURATION.toSeconds();
-        CookieUtil.deleteCookie(request, response, REFRESH_TOKEN_COOKIE_NAME);
-        CookieUtil.addCookie(response, REFRESH_TOKEN_COOKIE_NAME, refreshToken, cookieMaxAge);
-    }
-
     // 액세스 토큰을 쿠키에 저장
     private void addAccessTokenToCookie(HttpServletRequest request, HttpServletResponse response, String accessToken){
         int cookieMaxAge = (int) ACCESS_TOKEN_DURATION.toSeconds();
         CookieUtil.deleteCookie(request, response, "access_token");
         CookieUtil.addCookie(response, "access_token", accessToken, cookieMaxAge);
-    }
-
-    // 액세스 토큰을 패스에 추가하는 메서드
-    private String getTargetUrl(String token){
-        return UriComponentsBuilder.fromUriString(REDIRECT_PATH)
-                .queryParam("token", token)
-                .build()
-                .toUriString();
     }
 }

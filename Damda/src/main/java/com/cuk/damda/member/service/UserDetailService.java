@@ -1,5 +1,6 @@
 package com.cuk.damda.member.service;
 
+import com.cuk.damda.config.oauth.exception.TokenException;
 import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.repository.MemberRepository;
 import java.util.Collection;
@@ -20,6 +21,6 @@ public class UserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
        return memberRepository.findByEmail(email)
-                .orElseThrow(()->new IllegalArgumentException(email));
+                .orElseThrow(()->new TokenException(email+"not found"));
     }
 }

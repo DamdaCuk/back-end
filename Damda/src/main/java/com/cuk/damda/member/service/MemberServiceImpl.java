@@ -1,5 +1,6 @@
 package com.cuk.damda.member.service;
 
+import com.cuk.damda.member.controller.dto.MemberDTO;
 import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.repository.MemberRepository;
 import java.util.Optional;
@@ -19,9 +20,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member findByEmail(String email) { //이메일을 입력 받아 member 테이블에서 유저를 찾고 없으면 예외를 발생
-        return memberRepository.findByEmail(email)
-                .orElseThrow(()->new IllegalArgumentException("Unexpected user"));
+    public MemberDTO findByEmail(String email) { //이메일을 입력 받아 member 테이블에서 유저를 찾고 없으면 예외를 발생
+        Member member=memberRepository.findByEmail(email)
+                .orElse(null);
+        if(member==null) {
+            return null;
+        }else {
+            return MemberDTO.toDTO(member);
+        }
     }
 
     @Override

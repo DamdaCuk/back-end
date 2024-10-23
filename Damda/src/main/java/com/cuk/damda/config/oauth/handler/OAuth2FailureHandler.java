@@ -1,6 +1,7 @@
 package com.cuk.damda.config.oauth.handler;
 
 import com.cuk.damda.config.oauth.OAuthAuthorizationRequestBasedOnCookieRepository;
+import com.cuk.damda.config.oauth.exception.OAuth2AuthenticationProcessingException;
 import com.cuk.damda.util.CookieUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -33,6 +34,8 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
             OAuth2AuthenticationException oAuth2Exception = (OAuth2AuthenticationException) exception;
             log.error("OAuth2 Error Code: {}", oAuth2Exception.getError().getErrorCode());
             log.error("OAuth2 Error Description: {}", oAuth2Exception.getError().getDescription());
+
+            throw new OAuth2AuthenticationProcessingException("OAuth2 인증 처리 중 오류 발생");
         }
 
         log.error("Authentication failed. Exception message: {}", exception.getMessage());

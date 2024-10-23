@@ -59,7 +59,9 @@ dependencies {
 	annotationProcessor("jakarta.annotation:jakarta.annotation-api")
 
 	// redis
-	compileOnly group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
+//	compileOnly group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
+	implementation('org.springframework.boot:spring-boot-starter-data-redis')
+	implementation ('org.springframework.session:spring-session-data-redis')
 
 	//json
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'

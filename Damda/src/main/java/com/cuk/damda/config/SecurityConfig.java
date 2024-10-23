@@ -2,6 +2,7 @@ package com.cuk.damda.config;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
+import com.cuk.damda.config.jwt.JwtAuthorizationFilter;
 import com.cuk.damda.config.oauth.handler.OAuth2FailureHandler;
 import com.cuk.damda.config.oauth.handler.OAuth2SuccessHandler;
 import com.cuk.damda.config.oauth.OAuth2UserCustomService;
@@ -19,6 +20,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -31,6 +33,7 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuthAuthorizationRequestBasedOnCookieRepository oAuthAuthorizationRequestBasedOnCookieRepository;
     private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
     @Bean
     public WebSecurityCustomizer configure(){ //스프링 시큐리티 기능 비활성화. 정적 리소스에 설정
@@ -69,7 +72,7 @@ public class SecurityConfig {
 //                .exceptionHandling(user->user
 //                        .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
 //                                new AntPathRequestMatcher("/api/**")))
-
+                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class) // JwtAuthorizationFilter 추가
                 //cors 설정
                 .cors(cors->cors.configurationSource(corsConfigurationSource()));
 
@@ -84,7 +87,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+        configuration.setAllowedOriginPatterns(Collections.singletonList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);

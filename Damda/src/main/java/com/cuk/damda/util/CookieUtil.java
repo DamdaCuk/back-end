@@ -53,7 +53,7 @@ public class CookieUtil {
         return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(obj));
     }
 
-    //코키를 역직렬화해 객체로 변환
+    //쿠키를 역직렬화해 객체로 변환
     public static <T> T deserialize(Cookie cookie, Class<T> cls){
         return cls.cast(SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
     }

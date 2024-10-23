@@ -1,18 +1,19 @@
 package com.cuk.damda.config.jwt;
 
-import com.cuk.damda.member.domain.Member;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import java.security.Key;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class TokenProvider {
     private static final long ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS = 1000 * 60 * 30; // 30min
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14; //리프레시 토큰 만료 기간 : 14일
@@ -37,13 +39,14 @@ public class TokenProvider {
         this.key=Keys.hmacShaKeyFor(key);
     }
 
-    public String makeToken(Authentication authentication){
+    public String makeToken(Authentication authentication, Long userId){
         Date now=new Date();
         Date expiryDate=new Date(now.getTime()+ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS);
 
         return Jwts.builder()
                 .setSubject(authentication.getName()) //email로 토큰 생성
                 .setIssuedAt(now)
+                .claim("userId", userId) // 클레임에 userId 추가
                 .setIssuer(jwtProperties.getIssuer())
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS256) //이게 보안성 높아짐
@@ -51,13 +54,14 @@ public class TokenProvider {
     }
 
     //리프레시 토큰 생성
-    public String makeRefreshToken(Authentication authentication){
+    public String makeRefreshToken(Authentication authentication, Long userId){
         Date now=new Date();
         Date expiryDate=new Date(now.getTime()+REFRESH_TOKEN_EXPIRE_TIME);
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .setIssuedAt(now)
+                .claim("userId", userId) // 클레임에 userId 추가
                 .setIssuer(jwtProperties.getIssuer())
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -72,21 +76,23 @@ public class TokenProvider {
                     .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (Exception e){ //복호화 과정에서 에러가 나면 유효하지 않은 토큰
+        } catch (SecurityException | MalformedJwtException e) { //확인용. 에러 처리X
+            log.error("Invalid JWT Token", e);
+        } catch (ExpiredJwtException e) {
+            log.error("만료된 액세스 토큰 사용!!", e);
             return false;
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported JWT Token", e);
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty.", e);
         }
+        return false;
     }
 
     //토큰 기반으로 유저 ID를 가져오는 메서드
     public Long getUserId(String token){
         Claims claims=getClaims(token);
         return claims.get("userId",Long.class);
-    }
-
-    //토큰 기반으로 유저 email를 가져오는 메서드
-    public String getUserEmail(String token){
-        Claims claims=getClaims(token);
-        return claims.get("email",String.class);
     }
 
     private Claims getClaims(String token){
@@ -99,13 +105,16 @@ public class TokenProvider {
 
     //토큰 기반으로 인증 정보를 가져옴
     public Authentication getAuthentication(String token){
-        Claims claims=Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims=getClaims(token);
 
-        UserDetails user=new User(claims.getSubject(),"",Collections.emptyList());
+        Long userId=claims.get("userId",Long.class);
+        String email=claims.getSubject();
+
+        if(email==null){
+            System.out.println("email is null");
+        }
+
+        UserDetails user=new User(email,"",Collections.emptyList()); //유저 정보를 담아 인증 객체 생성
         return new UsernamePasswordAuthenticationToken(user, "",Collections.emptyList());
     }
 }
