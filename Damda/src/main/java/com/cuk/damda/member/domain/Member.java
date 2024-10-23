@@ -35,6 +35,14 @@ public class Member extends BaseEntity implements UserDetails {
         this.email = email;
         this.provider=provider;
     }
+
+    @Builder
+    private Member(String username, String email, String provider, Home home) {
+        this.username = username;
+        this.email = email;
+        this.provider=provider;
+        this.home = home;
+    }
     
     public static Member create(String username, String email, String provider) {
         return Member.builder()

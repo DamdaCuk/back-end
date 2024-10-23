@@ -89,7 +89,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                         principal.getUserInfo().getProvider().name());
                 memberDTO=MemberDTO.toDTO(member);
             }
-            Long userId=memberDTO.getUserId();
+            Long userId=memberDTO.userId();
 
             String accessToken = tokenProvider.makeToken(authentication, userId);
             String refreshToken = tokenProvider.makeRefreshToken(authentication, userId);

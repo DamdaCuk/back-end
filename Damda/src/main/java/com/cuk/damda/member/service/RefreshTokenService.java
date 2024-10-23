@@ -20,7 +20,7 @@ public class RefreshTokenService {
 
     //리프레시 토큰 생성
     public void createRefreshToken(MemberDTO member, String token, String accessToken) {
-        TokenRedis tokenRedis=new TokenRedis(token, member.getUserId(), accessToken);
+        TokenRedis tokenRedis=new TokenRedis(token, member.userId(), accessToken);
         tokenRedisRepository.save(tokenRedis);
     }
 
