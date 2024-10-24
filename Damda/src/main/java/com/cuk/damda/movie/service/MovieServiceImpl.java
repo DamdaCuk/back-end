@@ -1,10 +1,7 @@
 package com.cuk.damda.movie.service;
 
 import com.cuk.damda.movie.controller.response.MovieDetailsResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.cuk.damda.movie.controller.response.MovieListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,18 +9,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class MovieServiceImpl implements MovieService {
+
     @Autowired
     private final RestTemplate movieRestTemplate;
 
-    //일단 api에서 불러오니까 repo 필요없 --> 주로 DB에서 불러올듯
     @Override
     public MovieDetailsResponse getMovieDetails(int movieId){
         // TODO :: 메소드 추출(해당 아이디가 DB에 없을때만 호출)
@@ -95,4 +92,37 @@ public class MovieServiceImpl implements MovieService {
 
     //영화 검색결과 리스트
     //컨텐츠에 저장되면->movie db에도 저장
+    @Override
+    public List<MovieListResponse> getMovieList(String title, int page) {
+        //API 주소
+        String url = "/search/movie?query=" + title + "&language=ko-kr&page=" + page;
+
+        ResponseEntity<Map> apiResponse = movieRestTemplate.getForEntity(url, Map.class);
+
+        Map<String, Object> movieData = apiResponse.getBody();
+
+        //API 검색 결과
+        List<Map<String, Object>> movieList = (List<Map<String, Object>>) movieData.get("results");
+
+        //영화 목록 반환
+        List<MovieListResponse> resultList = new ArrayList<>();
+        for(Map<String, Object> movie: movieList){
+            // TODO :: posterPath는 null값이 있을 수 있으므로 예외처리 필요
+            String posterPath = null;
+            if(movie.get("poster_path") != null){
+                posterPath = (String) movie.get("poster_path");
+            }
+
+            resultList.add(MovieListResponse.from((int)movie.get("id"), (String) movie.get("title"), posterPath));
+
+        }
+        return resultList;
+    }
+
+
+    /**
+     * API에서 영화 세부정보
+     * @param movieId
+     */
+
 }
