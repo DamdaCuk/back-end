@@ -13,6 +13,7 @@ public class Movie extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long movieId;
+    private Integer apiId;
     private String director;
     private String actor;
     private String genre;
@@ -20,7 +21,8 @@ public class Movie extends BaseEntity {
     private String poster;
 
     @Builder
-    public Movie(String director, String actor, String genre, String title, String poster) {
+    public Movie(Integer apiId, String director, String actor, String genre, String title, String poster) {
+        this.apiId = apiId;
         this.director = director;
         this.actor = actor;
         this.genre = genre;
@@ -28,8 +30,9 @@ public class Movie extends BaseEntity {
         this.poster = poster;
     }
 
-    public static Movie create(String director, String actor, String genre, String title, String poster) {
+    public static Movie create(Integer apiId, String director, String actor, String genre, String title, String poster) {
         return Movie.builder()
+                .apiId(apiId)
                 .director(director)
                 .actor(actor)
                 .genre(genre)
