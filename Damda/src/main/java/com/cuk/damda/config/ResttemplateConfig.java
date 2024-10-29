@@ -20,6 +20,11 @@ public class RestTemplateConfig {
     @Value("${tmdb.api.key}")
     private String tmdbApiKey;
 
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+        return restTemplateBuilder.build();
+    }
+
     //영화 API
     @Bean
     public RestTemplate movieRestTemplate(RestTemplateBuilder builder) {
