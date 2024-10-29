@@ -14,6 +14,7 @@ import java.util.Locale;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -23,6 +24,7 @@ import org.w3c.dom.NodeList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MusicServiceImpl implements MusicService {
 
     @Value("music.api.key")
@@ -44,7 +46,8 @@ public class MusicServiceImpl implements MusicService {
                 InputStream xmlStream = connection.getInputStream();
                 return parseXML(xmlStream);
             } else {
-                throw new RuntimeException("Failed to get data from API. Response code: " + connection.getResponseCode());
+                log.warn("Failed to get data from API. Response code: "+connection.getResponseCode());
+                return null;
             }
         } catch (Exception e) {
             throw new IllegalArgumentException("검색 실패");
