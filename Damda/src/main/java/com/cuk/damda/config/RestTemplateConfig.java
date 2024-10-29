@@ -11,7 +11,7 @@ import java.time.Duration;
 
 @RequiredArgsConstructor
 @Configuration
-public class RestTemplateConfig_back {
+public class RestTemplateConfig {
 
     @Value("${tmdb.api.key}")
     private String tmdbApiKey;
@@ -32,5 +32,4 @@ public class RestTemplateConfig_back {
                 //.additionalInterceptors()
                 .build();
     }
-
 }
