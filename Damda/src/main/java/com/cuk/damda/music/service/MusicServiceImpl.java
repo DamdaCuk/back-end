@@ -35,7 +35,7 @@ public class MusicServiceImpl implements MusicService {
         URL url = null;
         HttpURLConnection connection;
         try {
-            url = new URL("http://www.maniadb.com/api/search/" + keyword + "/?sr=" + sr + "&key=" + apiKey);
+            url = new URL("http://www.maniadb.com/api/search/" + keyword + "/?sr=" + sr + "&display=30&key=" + apiKey);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/xml");
