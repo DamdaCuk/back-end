@@ -5,6 +5,7 @@ import com.cuk.damda.config.oauth.exception.TokenException;
 import com.cuk.damda.global.controller.ApiResponse;
 import com.cuk.damda.global.exception.exceptions.DBError;
 import com.cuk.damda.global.exception.exceptions.JwtValidationException;
+import com.cuk.damda.global.exception.exceptions.UserNotFound;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.validation.BindException;
@@ -122,6 +123,19 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UserNotFound.class)
+    public ApiResponse<Object> userNotFound(HandlerMethodValidationException e) {
+        String message = e.getAllErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        return ApiResponse.of(
+                HttpStatus.UNAUTHORIZED,
+                message,
+                null
+        );
+    }
 }
 
 
