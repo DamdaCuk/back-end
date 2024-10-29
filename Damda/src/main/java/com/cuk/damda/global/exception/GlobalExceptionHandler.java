@@ -3,6 +3,7 @@ package com.cuk.damda.global.exception;
 import com.cuk.damda.config.oauth.exception.OAuth2AuthenticationProcessingException;
 import com.cuk.damda.config.oauth.exception.TokenException;
 import com.cuk.damda.global.controller.ApiResponse;
+import com.cuk.damda.global.exception.exceptions.DBError;
 import com.cuk.damda.global.exception.exceptions.JwtValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -102,6 +103,20 @@ public class GlobalExceptionHandler {
 
         return ApiResponse.of(
                 HttpStatus.UNAUTHORIZED,
+                message,
+                null
+        );
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(DBError.class)
+    public ApiResponse<Object> dbError(HandlerMethodValidationException e) {
+        String message = e.getAllErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        return ApiResponse.of(
+                HttpStatus.INTERNAL_SERVER_ERROR,
                 message,
                 null
         );

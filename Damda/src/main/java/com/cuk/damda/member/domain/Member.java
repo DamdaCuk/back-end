@@ -52,6 +52,10 @@ public class Member extends BaseEntity implements UserDetails {
                 .build();
     }
 
+    public void setHome(Home home) {
+        this.home=home;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

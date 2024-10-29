@@ -39,6 +39,21 @@ public class TokenProvider {
         this.key=Keys.hmacShaKeyFor(key);
     }
 
+    public String makeSignInToken(Authentication authentication, Long userId){
+        Date now=new Date();
+        Date expiryDate=new Date(now.getTime()+ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS);
+
+        return Jwts.builder()
+                .setSubject(authentication.getName()) //email로 토큰 생성
+                .setIssuedAt(now)
+                .claim("userId", userId) // 클레임에 userId 추가
+                .claim("isNewUser", true)
+                .setIssuer(jwtProperties.getIssuer())
+                .setExpiration(expiryDate)
+                .signWith(key, SignatureAlgorithm.HS256) //이게 보안성 높아짐
+                .compact();
+    }
+
     public String makeToken(Authentication authentication, Long userId){
         Date now=new Date();
         Date expiryDate=new Date(now.getTime()+ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS);
