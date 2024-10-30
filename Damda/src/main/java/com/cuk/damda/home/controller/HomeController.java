@@ -1,6 +1,7 @@
 package com.cuk.damda.home.controller;
 
 import com.cuk.damda.global.controller.ApiResponse;
+import com.cuk.damda.home.controller.request.HomeNameRequest;
 import com.cuk.damda.home.service.HomeService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,8 @@ public class HomeController {
     private final HomeService homeService;
 
     @PostMapping("/create")
-    public ApiResponse<?> createHome(@RequestBody Map<String, String> homeName, @AuthenticationPrincipal UserDetails user) {
-        homeService.createHome(homeName.get("homeName"), user.getUsername());
+    public ApiResponse<?> createHome(@RequestBody HomeNameRequest homeNameRequest, @AuthenticationPrincipal UserDetails user) {
+        homeService.createHome(homeNameRequest.homeName(), user.getUsername());
         return ApiResponse.of(HttpStatus.CREATED, "success");
     }
 }
