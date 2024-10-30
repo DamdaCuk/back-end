@@ -52,7 +52,7 @@ public class Member extends BaseEntity implements UserDetails {
                 .build();
     }
 
-    public void setHome(Home home) {
+    public void updateHome(Home home) {
         this.home=home;
     }
 

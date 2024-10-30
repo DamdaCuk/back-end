@@ -34,6 +34,6 @@ public class HomeServiceImpl implements HomeService {
             throw new UserNotFound();
         }
         Member member=em.find(Member.class, findMember.get().getUserId());
-        member.setHome(home);
+        member.updateHome(home);
     }
 }
