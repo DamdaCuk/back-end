@@ -1,16 +1,10 @@
 package com.cuk.damda.config;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.ClientHttpRequest;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.http.HttpClient;
 import java.time.Duration;
 
 @RequiredArgsConstructor
@@ -19,6 +13,11 @@ public class RestTemplateConfig {
 
     @Value("${tmdb.api.key}")
     private String tmdbApiKey;
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+        return restTemplateBuilder.build();
+    }
 
     //영화 API
     @Bean
@@ -31,5 +30,4 @@ public class RestTemplateConfig {
                 //.additionalInterceptors()
                 .build();
     }
-
 }
