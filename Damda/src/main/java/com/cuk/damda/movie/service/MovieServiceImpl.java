@@ -1,7 +1,14 @@
 package com.cuk.damda.movie.service;
 
+import com.cuk.damda.contents.domain.Contents;
+import com.cuk.damda.contents.domain.Enum.ItemType;
+import com.cuk.damda.contents.repository.ContentsRepository;
+import com.cuk.damda.home.domain.Home;
+import com.cuk.damda.home.repository.HomeRepository;
 import com.cuk.damda.movie.controller.response.MovieDetailsResponse;
 import com.cuk.damda.movie.controller.response.MovieListResponse;
+import com.cuk.damda.movie.domain.Movie;
+import com.cuk.damda.movie.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -21,11 +26,115 @@ public class MovieServiceImpl implements MovieService {
     @Autowired
     private final RestTemplate movieRestTemplate;
 
+    @Autowired
+    private final MovieRepository movieRepository;
+
+    @Autowired
+    private final ContentsRepository contentsRepository;
+
+    @Autowired
+    private HomeRepository homeRepository;
+
+    /**
+     * contents에 영화 등록
+     * @param apiId
+     */
     @Override
-    public MovieDetailsResponse getMovieDetails(int movieId){
-        // TODO :: 메소드 추출(해당 아이디가 DB에 없을때만 호출)
+    public void addMovieContents(int apiId) {
+        // TODO :: home 테스트 용 코드 -> 추후 수정
+//        Home testHome = Home.create(0L,0L);
+//        homeRepository.save(testHome);
+        Home testHome = homeRepository.findByHomeId(1L);
+
+        MovieDetailsResponse movieDetails;
+        //DB에서 movie 정보 탐색
+        Movie movieEntity = movieRepository.findByApiId(apiId);
+
+        if(movieEntity == null){
+            //없으면 api에서 정보탐색
+            System.out.println("API에서 탐색!!");
+            movieDetails = getMovieDetails(apiId);
+
+            Movie apiEntity = Movie.create(
+                    apiId,
+                    movieDetails.director(),
+                    movieDetails.actor(),
+                    movieDetails.genre(),
+                    movieDetails.title(),
+                    movieDetails.posterPath()
+            );
+            movieEntity = movieRepository.save(apiEntity);
+        }
+
+        Contents contents = Contents.create(
+            movieEntity.getMovieId(),
+            ItemType.MOVIE,
+            movieEntity.getTitle(),
+            movieEntity.getPoster(),
+            testHome
+        );
+
+        //중복 데이터 방지
+        Contents existContent = contentsRepository.findByItemIdAndHome(movieEntity.getMovieId(), testHome).orElse(null);
+        if(existContent != null){
+            throw new IllegalArgumentException("이미 저장된 컨텐츠 입니다.");
+        }
+
+        contentsRepository.save(contents);
+    }
+
+    /**
+     * 제목으로 영화 리스트 조회(외부 api)
+     * @param title
+     * @param page
+     * @return 영화 리스트
+     */
+    @Override
+    public List<MovieListResponse> getMovieList(String title, int page) {
+        //API 주소
+        String url = "/search/movie?query=" + title + "&language=ko-kr&page=" + page;
+
+        ResponseEntity<Map> apiResponse = movieRestTemplate.getForEntity(url, Map.class);
+
+        Map<String, Object> movieData = apiResponse.getBody();
+
+        //API 검색 결과
+        List<Map<String, Object>> movieList = (List<Map<String, Object>>) movieData.get("results");
+
+        //영화 목록 반환
+        List<MovieListResponse> resultList = new ArrayList<>();
+        for(Map<String, Object> movie: movieList){
+            // TODO :: posterPath는 null값이 있을 수 있으므로 예외처리 필요
+            String posterPath = null;
+            if(movie.get("poster_path") != null){
+                posterPath = (String) movie.get("poster_path");
+            }
+
+            resultList.add(MovieListResponse.from((int)movie.get("id"), (String) movie.get("title"), posterPath));
+
+        }
+        return resultList;
+    }
+
+    /**
+     * contents에서 영화 삭제
+     * @param contentsId
+     */
+    @Override
+    public void deleteMovieContents(Long contentsId) {
+        Contents deleteContents = contentsRepository.findById(contentsId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컨텐츠입니다."));
+        contentsRepository.delete(deleteContents);
+    }
+
+    /**
+     * 영화 상세 정보 조회(외부 api)
+     * @param apiId
+     * @return
+     */
+    public MovieDetailsResponse getMovieDetails(int apiId) {
         //API 주소 생성
-        String url = "/movie/" + movieId + "?language=ko-kr&append_to_response=credits";
+        String url = "/movie/" + apiId + "?language=ko-kr&append_to_response=credits";
         //영화 정보 받아오기
         ResponseEntity<Map> apiResponse = movieRestTemplate.getForEntity(url, Map.class);
 
@@ -90,39 +199,6 @@ public class MovieServiceImpl implements MovieService {
         return MovieDetailsResponse.from(title, posterPath, director, casts, genres);
     }
 
-    //영화 검색결과 리스트
-    //컨텐츠에 저장되면->movie db에도 저장
-    @Override
-    public List<MovieListResponse> getMovieList(String title, int page) {
-        //API 주소
-        String url = "/search/movie?query=" + title + "&language=ko-kr&page=" + page;
 
-        ResponseEntity<Map> apiResponse = movieRestTemplate.getForEntity(url, Map.class);
-
-        Map<String, Object> movieData = apiResponse.getBody();
-
-        //API 검색 결과
-        List<Map<String, Object>> movieList = (List<Map<String, Object>>) movieData.get("results");
-
-        //영화 목록 반환
-        List<MovieListResponse> resultList = new ArrayList<>();
-        for(Map<String, Object> movie: movieList){
-            // TODO :: posterPath는 null값이 있을 수 있으므로 예외처리 필요
-            String posterPath = null;
-            if(movie.get("poster_path") != null){
-                posterPath = (String) movie.get("poster_path");
-            }
-
-            resultList.add(MovieListResponse.from((int)movie.get("id"), (String) movie.get("title"), posterPath));
-
-        }
-        return resultList;
-    }
-
-
-    /**
-     * API에서 영화 세부정보
-     * @param movieId
-     */
 
 }
