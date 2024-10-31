@@ -2,7 +2,7 @@ package com.cuk.damda.music.controller;
 
 import com.cuk.damda.global.controller.ApiResponse;
 import com.cuk.damda.music.controller.dto.ManiaDBDTO;
-import com.cuk.damda.music.controller.dto.MusicSearchReq;
+import com.cuk.damda.music.controller.request.MusicSearchRequest;
 import com.cuk.damda.music.service.MusicService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,8 @@ public class MusicController {
     private final MusicService musicService;
 
     @PostMapping("/search")
-    public ApiResponse<?> searchMusic(@RequestBody MusicSearchReq musicSearchReq) {
-        List<ManiaDBDTO> musics = musicService.searchToManiaDB(musicSearchReq);
+    public ApiResponse<?> searchMusic(@RequestBody MusicSearchRequest musicSearchRequest) {
+        List<ManiaDBDTO> musics = musicService.searchToManiaDB(musicSearchRequest);
         return ApiResponse.ok(musics);
     }
 }

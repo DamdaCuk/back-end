@@ -1,7 +1,7 @@
 package com.cuk.damda.music.service;
 
 import com.cuk.damda.music.controller.dto.ManiaDBDTO;
-import com.cuk.damda.music.controller.dto.MusicSearchReq;
+import com.cuk.damda.music.controller.request.MusicSearchRequest;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -31,9 +31,9 @@ public class MusicServiceImpl implements MusicService {
     private String apiKey;
 
     @Override
-    public List<ManiaDBDTO> searchToManiaDB(MusicSearchReq musicSearchReq) {
-        String keyword=musicSearchReq.keyword();
-        String type=musicSearchReq.type();
+    public List<ManiaDBDTO> searchToManiaDB(MusicSearchRequest musicSearchRequest) {
+        String keyword= musicSearchRequest.keyword();
+        String type= musicSearchRequest.type();
         URL url = null;
         HttpURLConnection connection;
         try {
