@@ -23,16 +23,9 @@ import java.util.*;
 @Service
 public class MovieServiceImpl implements MovieService {
 
-    @Autowired
     private final RestTemplate movieRestTemplate;
-
-    @Autowired
     private final MovieRepository movieRepository;
-
-    @Autowired
     private final ContentsRepository contentsRepository;
-
-    @Autowired
     private HomeRepository homeRepository;
 
     /**
@@ -52,7 +45,7 @@ public class MovieServiceImpl implements MovieService {
 
         if(movieEntity == null){
             //없으면 api에서 정보탐색
-            System.out.println("API에서 탐색!!");
+            log.info("API에서 탐색!!");
             movieDetails = getMovieDetails(apiId);
 
             Movie apiEntity = Movie.create(
@@ -113,6 +106,7 @@ public class MovieServiceImpl implements MovieService {
             resultList.add(MovieListResponse.from((int)movie.get("id"), (String) movie.get("title"), posterPath));
 
         }
+        // TODO :: 가끔 api가 리스트 못 불러올 때 있는듯 --> 빈 리스트 반환받는 경우 있음
         return resultList;
     }
 
