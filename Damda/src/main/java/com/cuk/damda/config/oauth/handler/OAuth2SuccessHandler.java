@@ -88,6 +88,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                         principal.getUserInfo().getName(),
                         principal.getUserInfo().getProvider().name());
                 memberDTO=MemberDTO.toDTO(member);
+                tokenProvider.makeSignInToken(authentication, memberDTO.userId()); //isNewUser = ture 토큰 발급
             }
             Long userId=memberDTO.userId();
 
