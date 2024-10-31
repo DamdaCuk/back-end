@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MovieService {
-    MovieDetailsResponse getMovieDetails(int movieId);
     List<MovieListResponse> getMovieList(String title, int page);
+    void addMovieContents(int apiId);
+    void deleteMovieContents(Long contentsId);
 }
