@@ -33,11 +33,11 @@ public class MusicServiceImpl implements MusicService {
     @Override
     public List<ManiaDBDTO> searchToManiaDB(MusicSearchReq musicSearchReq) {
         String keyword=musicSearchReq.keyword();
-        String sr=musicSearchReq.sr();
+        String type=musicSearchReq.type();
         URL url = null;
         HttpURLConnection connection;
         try {
-            url = new URL("http://www.maniadb.com/api/search/" + keyword + "/?sr=" + sr + "&display=30&key=" + apiKey);
+            url = new URL("http://www.maniadb.com/api/search/" + keyword + "/?sr=" + type + "&display=30&key=" + apiKey);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/xml");

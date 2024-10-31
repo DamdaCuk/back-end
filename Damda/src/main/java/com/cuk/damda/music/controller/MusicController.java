@@ -6,7 +6,6 @@ import com.cuk.damda.music.controller.dto.MusicSearchReq;
 import com.cuk.damda.music.service.MusicService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
