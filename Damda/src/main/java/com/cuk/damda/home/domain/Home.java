@@ -19,6 +19,7 @@ public class Home extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long homeId;
 
+    private String homeName;
     private Long knock;
     private Long likes;
 
@@ -26,15 +27,17 @@ public class Home extends BaseEntity {
     private Set<HomeItem> homeItems = new HashSet<>();
 
     @Builder
-    public Home(Long knock, Long likes) {
+    public Home(Long knock, Long likes, String homeName) {
+        this.homeName=homeName;
         this.knock=knock;
         this.likes=likes;
     }
 
-    public static Home create(Long knock, Long likes) {
+    public static Home createHome(String homeName) {
         return Home.builder()
-                .knock(knock)
-                .likes(likes)
+                .homeName(homeName)
+                .knock(0L)
+                .likes(0L)
                 .build();
     }
 }

@@ -1,4 +1,4 @@
-//package com.cuk.damda.config;
+package com.cuk.damda.config;
 //
 //import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 //
@@ -24,11 +24,11 @@
 //import org.springframework.web.cors.CorsConfiguration;
 //import org.springframework.web.cors.CorsConfigurationSource;
 //import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-//
+
 //@Configuration
 ////@EnableWebSecurity //Security Filter 등록
 //@RequiredArgsConstructor
-//public class SecurityConfig {
+public class SecurityConfig {
 ////    private final OAuth2UserCustomService oAuth2UserCustomService;
 ////    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 ////    private final OAuthAuthorizationRequestBasedOnCookieRepository oAuthAuthorizationRequestBasedOnCookieRepository;
@@ -95,5 +95,5 @@
 ////        UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
 ////        source.registerCorsConfiguration("/**", configuration);
 ////        return source;
-////    }
-//}
+////   }
+}
