@@ -1,13 +1,11 @@
 package com.cuk.damda.book.controller.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
-public class BookListResponse {
-    private String title;
-    private String author;
-    private String image;
-    private String description;
+public record BookListResponse(
+        String title,       // 제목
+        String author,      // 작가
+        String publisher,   // 출판사
+        String image,       // 이미지
+        String description   // 줄거리
+) {
 }
+

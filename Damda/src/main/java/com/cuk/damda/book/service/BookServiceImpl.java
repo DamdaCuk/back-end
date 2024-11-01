@@ -4,7 +4,6 @@ package com.cuk.damda.book.service;
 import com.cuk.damda.book.controller.response.BookListResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +25,11 @@ public class BookServiceImpl {
 
     private final String apiUrl = "https://openapi.naver.com/v1/search/book.json";
 
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String clientId;
 
-    //경로 설정이 안됨........
-    //@Value("${spring.security.oauth2.client.registration.naver.client-id}")
-    private String clientId = "z54K437Y6O8TwjHQyRs7";
-
-    //@Value("${spring.security.oauth2.client.registration.naver.client-secret}")
-    private String clientSecret = "";
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
+    private String clientSecret;
 
     public List<BookListResponse> searchBookByTitle(String title) {
         String encodedTitle;
@@ -107,8 +104,10 @@ public class BookServiceImpl {
                 bookList.add(new BookListResponse(
                         item.path("title").asText(),
                         item.path("author").asText(),
+                        item.path("publisher").asText(),
                         item.path("image").asText(),
                         item.path("description").asText()
+                        // 출판사 정보 추가
                 ));
             }
         } catch (IOException e) {
@@ -117,6 +116,7 @@ public class BookServiceImpl {
         return bookList;
     }
 }
+
 
 
 //RestTemplate으로 해봤지만 안되는 코드....
@@ -144,10 +144,10 @@ public class BookServiceImpl {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     //@Value("${spring.security.oauth2.client.registration.naver.client-id}")
-    private String clientId = "z54K437Y6O8TwjHQyRs7";
+    private String clientId;
 
     //@Value("${spring.security.oauth2.client.registration.naver.client-secret}")
-    private String clientSecret = "hcjtLyLHQ5";
+    private String clientSecret;
 
     // RestTemplate을 생성자 주입으로 받아오기
     public BookServiceImpl(RestTemplate restTemplate) {
