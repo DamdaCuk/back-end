@@ -26,7 +26,7 @@ public class MovieServiceImpl implements MovieService {
     private final RestTemplate movieRestTemplate;
     private final MovieRepository movieRepository;
     private final ContentsRepository contentsRepository;
-    private HomeRepository homeRepository;
+    private final HomeRepository homeRepository;
 
     /**
      * contents에 영화 등록
@@ -37,7 +37,8 @@ public class MovieServiceImpl implements MovieService {
         // TODO :: home 테스트 용 코드 -> 추후 수정
 //        Home testHome = Home.create(0L,0L);
 //        homeRepository.save(testHome);
-        Home testHome = homeRepository.findByHomeId(1L);
+        Home testHome = homeRepository.findByHomeId(2L)
+                .orElseThrow(() -> new IllegalArgumentException("home을 찾을 수 없습니다."));
 
         MovieDetailsResponse movieDetails;
         //DB에서 movie 정보 탐색
@@ -68,7 +69,7 @@ public class MovieServiceImpl implements MovieService {
         );
 
         //중복 데이터 방지
-        Contents existContent = contentsRepository.findByItemIdAndHome(movieEntity.getMovieId(), testHome).orElse(null);
+        Contents existContent = contentsRepository.findByItemIdAndHomeAndItemType(movieEntity.getMovieId(), testHome, ItemType.MOVIE).orElse(null);
         if(existContent != null){
             throw new IllegalArgumentException("이미 저장된 컨텐츠 입니다.");
         }

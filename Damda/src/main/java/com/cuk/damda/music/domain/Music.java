@@ -15,14 +15,14 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@Table(name="movie_tb")
+@Table(name="music_tb")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Music extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long musicId;
-    private Integer apiId;
+    private String apiId;
     private String title;
     private String artist;
     private String album;
@@ -30,7 +30,7 @@ public class Music extends BaseEntity {
     private String albumCover;
 
     @Builder
-    public Music(Integer apiId, String title, String artist, String album, LocalDate releaseDate, String albumCover) {
+    public Music(String apiId, String title, String artist, String album, LocalDate releaseDate, String albumCover) {
         this.apiId = apiId;
         this.title = title;
         this.artist = artist;
@@ -39,7 +39,7 @@ public class Music extends BaseEntity {
         this.albumCover = albumCover;
     }
 
-    public static Music create(Integer apiId, String title, String artist, String album, LocalDate releaseDate, String albumCover) {
+    public static Music create(String apiId, String title, String artist, String album, LocalDate releaseDate, String albumCover) {
         return Music.builder()
                 .apiId(apiId)
                 .title(title)

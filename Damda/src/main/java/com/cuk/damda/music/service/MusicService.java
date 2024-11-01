@@ -8,4 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface MusicService {
     List<ManiaDBDTO> searchToManiaDB(MusicSearchRequest musicSearchRequest);
+
+    void addMusicContents(ManiaDBDTO maniaDBDTO);
+    void deleteMusicContents(Long contentsId);
 }
