@@ -1,5 +1,10 @@
 package com.cuk.damda.music.service;
 
+import com.cuk.damda.contents.domain.Contents;
+import com.cuk.damda.contents.domain.Enum.ItemType;
+import com.cuk.damda.contents.repository.ContentsRepository;
+import com.cuk.damda.home.domain.Home;
+import com.cuk.damda.home.repository.HomeRepository;
 import com.cuk.damda.music.controller.dto.ManiaDBDTO;
 import com.cuk.damda.music.controller.request.MusicSearchRequest;
 import java.io.InputStream;
@@ -13,6 +18,9 @@ import java.util.List;
 import java.util.Locale;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import com.cuk.damda.music.domain.Music;
+import com.cuk.damda.music.repository.MusicRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +34,10 @@ import org.w3c.dom.NodeList;
 @RequiredArgsConstructor
 @Slf4j
 public class MusicServiceImpl implements MusicService {
+
+    private final MusicRepository musicRepository;
+    private final HomeRepository homeRepository;
+    private final ContentsRepository contentsRepository;
 
     @Value("music.api.key")
     private String apiKey;
@@ -52,6 +64,60 @@ public class MusicServiceImpl implements MusicService {
         } catch (Exception e) {
             throw new IllegalArgumentException("검색 실패");
         }
+    }
+
+    /**
+     * contents에 음악 저장
+     * @param maniaDBDTO
+     */
+    @Override
+    public void addMusicContents(ManiaDBDTO maniaDBDTO) {
+//            Home testHome = Home.createHome("테스트홈");
+//            homeRepository.save(testHome);
+//        // TODO :: 테스트 용 home
+        Home testHome = homeRepository.findByHomeId(2L)
+                .orElseThrow(() -> new IllegalArgumentException("home을 찾을 수 없습니다."));
+        //DB에 이미 있는지 조회
+        Music music = musicRepository.findByApiId(maniaDBDTO.apiId())
+                .orElse(null);
+        //없으면 생성
+        if(music == null) {
+            Music entity = Music.create(
+                    maniaDBDTO.apiId(),
+                    maniaDBDTO.title(),
+                    maniaDBDTO.artist(),
+                    maniaDBDTO.album(),
+                    maniaDBDTO.releaseDate(),
+                    maniaDBDTO.albumCover()
+            );
+            music = musicRepository.save(entity);
+        }
+
+        //contents DB에 저장 --> 이미 있으면 x
+        Contents contennt = Contents.create(
+                music.getMusicId(),
+                ItemType.MUSIC,
+                music.getTitle(),
+                music.getAlbumCover(),
+                testHome
+        );
+        Contents existContent = contentsRepository.findByItemIdAndHomeAndItemType(music.getMusicId(), testHome, ItemType.MUSIC).orElse(null);
+        if(existContent != null){
+            throw new IllegalArgumentException("이미 저장된 컨텐츠 입니다.");
+        }
+
+        contentsRepository.save(contennt);
+    }
+
+    /**
+     * contents에서 음악 삭제
+     * @param contentsId
+     */
+    @Override
+    public void deleteMusicContents(Long contentsId) {
+        Contents deleteContents = contentsRepository.findById(contentsId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컨텐츠입니다."));
+        contentsRepository.delete(deleteContents);
     }
 
     public static List<ManiaDBDTO> parseXML(InputStream xmlStream) throws Exception {
