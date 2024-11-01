@@ -17,7 +17,7 @@ public class Guestbook extends BaseEntity {
     private Long guestbookId;
     @Column(columnDefinition = "TEXT")
     private String comment;
-
+    private Long likes;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_id", nullable = false)
     private Home home;
@@ -31,5 +31,9 @@ public class Guestbook extends BaseEntity {
         return Guestbook.builder()
                 .comment(comment)
                 .build();
+    }
+
+    public void incrementLikes(){
+        this.likes++;
     }
 }

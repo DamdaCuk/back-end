@@ -1,9 +1,45 @@
 package com.cuk.damda.guestbook.service;
 
+import com.cuk.damda.global.exception.exceptions.GuestbookNotFoundException;
+import com.cuk.damda.global.exception.exceptions.HomeNotFoundException;
+import com.cuk.damda.global.exception.exceptions.UserNotFoundException;
+import com.cuk.damda.guestbook.controller.request.LikeRequest;
+import com.cuk.damda.guestbook.domain.Guestbook;
+import com.cuk.damda.guestbook.domain.Likes;
+import com.cuk.damda.guestbook.repository.GuestbookRepository;
+import com.cuk.damda.guestbook.repository.LikesRepository;
+import com.cuk.damda.home.domain.Home;
+import com.cuk.damda.home.repository.HomeRepository;
+import com.cuk.damda.member.domain.Member;
+import com.cuk.damda.member.repository.MemberRepository;
+import jakarta.transaction.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class GuestbookServiceImpl implements GuestbookService {
+    private final GuestbookRepository guestbookRepository;
+    private final LikesRepository likesRepository;
+    private final MemberRepository memberRepository;
+    private final HomeRepository homeRepository;
+
+    @Transactional
+    @Override
+    public void addLike(LikeRequest likeRequest, String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        Home home=homeRepository.findById(likeRequest.getHomeId())
+                .orElseThrow(HomeNotFoundException::new);
+
+        Guestbook guestbook=guestbookRepository.findByHome(home)
+                .orElseThrow(GuestbookNotFoundException::new);
+
+        Likes like=new Likes(member, home);
+        likesRepository.save(like); //좋아요 테이블에 저장(좋아요를 누른 사람, 좋아요가 눌린 홈)
+
+        guestbook.incrementLikes(); //방명록 좋아요 수 업데이트
+    }
 }
