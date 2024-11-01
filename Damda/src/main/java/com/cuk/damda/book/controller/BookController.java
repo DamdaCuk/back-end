@@ -21,13 +21,11 @@ public class BookController {
     private BookServiceImpl bookService;
 
     @GetMapping("/search")
-    public ApiResponse<List<BookListResponse>> searchBook(@RequestParam("title") String title) {
-        List<BookListResponse> bookList = bookService.searchBookByTitle(title);
+    public ApiResponse<List<BookListResponse>> searchBook(@RequestParam("title") String title, @RequestParam("page") int page) {
+        List<BookListResponse> bookList = bookService.searchBookByTitle(title, page);
         return ApiResponse.ok(bookList);
     }
 }
-
-
 
 
 

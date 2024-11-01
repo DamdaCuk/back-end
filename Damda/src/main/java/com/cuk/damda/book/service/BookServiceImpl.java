@@ -31,7 +31,7 @@ public class BookServiceImpl {
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String clientSecret;
 
-    public List<BookListResponse> searchBookByTitle(String title) {
+    public List<BookListResponse> searchBookByTitle(String title, int start) {
         String encodedTitle;
         try {
             encodedTitle = URLEncoder.encode(title, "UTF-8");
@@ -39,11 +39,13 @@ public class BookServiceImpl {
             throw new RuntimeException("검색어 인코딩 실패", e);
         }
 
-        String requestUrl = apiUrl + "?query=" + encodedTitle + "&sort=sim";
+
+        String requestUrl = apiUrl + "?query=" + encodedTitle + "&display=20&start=" + start + "&sort=sim";
 
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("X-Naver-Client-Id", clientId);
         requestHeaders.put("X-Naver-Client-Secret", clientSecret);
+
         String response = get(requestUrl, requestHeaders);
         return parseBookListResponse(response);  // 파싱 후 결과 반환
     }
@@ -99,7 +101,6 @@ public class BookServiceImpl {
             JsonNode root = mapper.readTree(responseBody);
             JsonNode items = root.path("items");
 
-            // 여러 개의 책 정보를 리스트에 추가
             for (JsonNode item : items) {
                 bookList.add(new BookListResponse(
                         item.path("title").asText(),
@@ -107,7 +108,6 @@ public class BookServiceImpl {
                         item.path("publisher").asText(),
                         item.path("image").asText(),
                         item.path("description").asText()
-                        // 출판사 정보 추가
                 ));
             }
         } catch (IOException e) {
