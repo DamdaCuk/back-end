@@ -74,7 +74,7 @@ public class MusicServiceImpl implements MusicService {
     public void addMusicContents(ManiaDBDTO maniaDBDTO) {
 //            Home testHome = Home.createHome("테스트홈");
 //            homeRepository.save(testHome);
-//        // TODO :: 테스트 용 home
+
         Home testHome = homeRepository.findByHomeId(2L)
                 .orElseThrow(() -> new IllegalArgumentException("home을 찾을 수 없습니다."));
         //DB에 이미 있는지 조회
