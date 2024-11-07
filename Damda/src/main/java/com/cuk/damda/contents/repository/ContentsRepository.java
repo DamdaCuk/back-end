@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface ContentsRepository extends JpaRepository<Contents, Long> {
     Optional<Contents> findByItemIdAndHomeAndItemType(Long itemId, Home home, ItemType itemType);
+    Optional<Contents> findByHome_HomeIdAndContentsId(Long homeId, Long contentsId);
 }
