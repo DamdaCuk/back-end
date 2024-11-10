@@ -8,6 +8,7 @@ import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,18 +23,36 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     @Transactional
-    public void createHome(String homeName, String userEmail) {
-        Home home=Home.createHome(homeName);
-        Home makeHome=homeRepository.save(home);
-        if(!makeHome.getHomeName().equals(homeName)) {
+    public void memberInsertHome(Home home, String userEmail) throws UserNotFound {
+        try {
+            System.out.println(home);
+            System.out.println(homeRepository.findByHomeId(home.getHomeId()));
+            Optional<Member> findMember = memberRepository.findByEmail(userEmail);
+            if (findMember.isEmpty()) {
+                throw new UserNotFound();
+            }
+
+            Member member = findMember.get();
+            System.out.println(home);
+            member.updateHome(home);
+            System.out.println(member);
+            System.out.println(member.getHome());
+            memberRepository.save(member);
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Home createHome(String homeName) throws UserNotFound {
+        Home home = Home.createHome(homeName);
+        Home makeHome = homeRepository.save(home);
+        em.flush();
+        if (!makeHome.getHomeName().equals(homeName)) {
             throw new DBError("create home failed");
         }
-
-        Optional<Member> findMember=memberRepository.findByEmail(userEmail);
-        if(findMember.isPresent()) {
-            throw new UserNotFound();
-        }
-        Member member=em.find(Member.class, findMember.get().getUserId());
-        member.updateHome(home);
+        return home;
     }
 }
