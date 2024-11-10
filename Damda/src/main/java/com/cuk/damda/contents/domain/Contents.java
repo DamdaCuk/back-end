@@ -21,7 +21,10 @@ public class Contents extends BaseEntity {
     private Long contentsId;
 
     private Long itemId;
+
+    //@Enumerated(EnumType.STRING)
     private ItemType itemType;
+
     private String itemTitle;
     private String itemImg;
 
