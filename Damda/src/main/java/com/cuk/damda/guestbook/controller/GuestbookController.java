@@ -19,20 +19,26 @@ public class GuestbookController {
     private final GuestbookService guestbookService;
 
     @PostMapping("/like/add")
-    public void addLike(@RequestBody LikeRequest likeRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public void addLike(@RequestBody LikeRequest likeRequest
+            , @AuthenticationPrincipal UserDetails userDetails
+    ) {
         String email=userDetails.getUsername();
         guestbookService.addLike(likeRequest, email);
     }
 
     //로그인 한 유저가 해당 홈에 좋아요를 눌렀는지 확인
     @PostMapping("/like")
-    public ApiResponse<?> isLike(@RequestBody LikeRequest likeRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ApiResponse<?> isLike(@RequestBody LikeRequest likeRequest
+            , @AuthenticationPrincipal UserDetails userDetails
+    ) {
         String email=userDetails.getUsername();
         return ApiResponse.ok(guestbookService.isLike(likeRequest,email));
     }
 
     @PostMapping("/like/delete")
-    public ApiResponse<?> deleteLike(@RequestBody LikeRequest likeRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ApiResponse<?> deleteLike(@RequestBody LikeRequest likeRequest
+            , @AuthenticationPrincipal UserDetails userDetails
+    ) {
         String email=userDetails.getUsername();
         guestbookService.deleteLike(likeRequest, email);
         return ApiResponse.ok("성공적으로 좋아요를 취소함");

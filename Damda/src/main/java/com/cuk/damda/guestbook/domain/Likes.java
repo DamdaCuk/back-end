@@ -4,6 +4,8 @@ import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.member.domain.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -20,6 +22,7 @@ import lombok.ToString;
 @ToString
 public class Likes {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member likeGiver;
