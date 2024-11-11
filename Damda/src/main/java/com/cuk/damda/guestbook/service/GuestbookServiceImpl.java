@@ -37,9 +37,17 @@ public class GuestbookServiceImpl implements GuestbookService {
         Guestbook guestbook=guestbookRepository.findByHome(home)
                 .orElseThrow(GuestbookNotFoundException::new);
 
-        Likes like=new Likes(member, home);
-        likesRepository.save(like); //좋아요 테이블에 저장(좋아요를 누른 사람, 좋아요가 눌린 홈)
+        Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home);
 
-        guestbook.incrementLikes(); //방명록 좋아요 수 업데이트
+        if(likeFind!=null) {
+            throw new RuntimeException("이미 좋아요를 눌렀습니다.");
+        }else{ //좋아요를 누르지 않은 경우 좋아요 누르기
+            Likes like=new Likes(member, home);
+            likesRepository.save(like); //좋아요 테이블에 저장(좋아요를 누른 사람, 좋아요가 눌린 홈)
+
+            guestbook.incrementLikes(); //방명록 좋아요 수 업데이트
+        }
+
     }
+
 }
