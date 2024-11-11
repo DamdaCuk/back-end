@@ -33,9 +33,6 @@ public class GuestbookServiceImpl implements GuestbookService {
         Home home=homeRepository.findById(likeRequest.getHomeId())
                 .orElseThrow(HomeNotFoundException::new);
 
-        Guestbook guestbook=guestbookRepository.findByHome(home)
-                .orElseThrow(GuestbookNotFoundException::new);
-
         Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home);
 
         if(likeFind!=null) {
@@ -44,7 +41,7 @@ public class GuestbookServiceImpl implements GuestbookService {
             Likes like=new Likes(member, home);
             likesRepository.save(like); //좋아요 테이블에 저장(좋아요를 누른 사람, 좋아요가 눌린 홈)
 
-            guestbook.incrementLikes(); //방명록 좋아요 수 업데이트
+            home.incrementLikes(); //방명록 좋아요 수 업데이트
         }
 
     }
@@ -58,9 +55,6 @@ public class GuestbookServiceImpl implements GuestbookService {
         Home home=homeRepository.findById(likeRequest.getHomeId())
                 .orElseThrow(HomeNotFoundException::new);
 
-        Guestbook guestbook=guestbookRepository.findByHome(home)
-                .orElseThrow(GuestbookNotFoundException::new);
-
         Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home);
         return likeFind != null;
     }
@@ -73,8 +67,6 @@ public class GuestbookServiceImpl implements GuestbookService {
         Home home=homeRepository.findById(likeRequest.getHomeId())
                 .orElseThrow(HomeNotFoundException::new);
 
-        Guestbook guestbook=guestbookRepository.findByHome(home)
-                .orElseThrow(GuestbookNotFoundException::new);
 
         Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home);
 
@@ -82,7 +74,7 @@ public class GuestbookServiceImpl implements GuestbookService {
             throw new RuntimeException("좋아요를 누른 기록이 존재하지 않습니다.");
         }else{ //좋아요를 누른 기록이 있는 경우 좋아요 취소 가능
             likesRepository.delete(likeFind);
-            guestbook.decrementLikes(); //방명록 좋아요 수 업데이트
+            home.decrementLikes(); //방명록 좋아요 수 업데이트
         }
     }
 }

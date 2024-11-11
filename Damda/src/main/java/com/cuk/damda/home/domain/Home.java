@@ -37,4 +37,12 @@ public class Home extends BaseEntity {
                 .likes(likes)
                 .build();
     }
+
+    public void incrementLikes(){
+        this.likes++;
+    }
+
+    public void decrementLikes(){
+        this.likes--;
+    }
 }
