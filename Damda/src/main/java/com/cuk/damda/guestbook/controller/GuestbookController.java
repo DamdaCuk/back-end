@@ -1,5 +1,6 @@
 package com.cuk.damda.guestbook.controller;
 
+import com.cuk.damda.global.controller.ApiResponse;
 import com.cuk.damda.guestbook.controller.request.LikeRequest;
 import com.cuk.damda.guestbook.service.GuestbookService;
 import java.security.Principal;
@@ -21,5 +22,12 @@ public class GuestbookController {
     public void addLike(@RequestBody LikeRequest likeRequest, @AuthenticationPrincipal UserDetails userDetails) {
         String email=userDetails.getUsername();
         guestbookService.addLike(likeRequest, email);
+    }
+
+    //로그인 한 유저가 해당 홈에 좋아요를 눌렀는지 확인
+    @PostMapping("/like")
+    public ApiResponse<?> isLike(@RequestBody LikeRequest likeRequest, @AuthenticationPrincipal UserDetails userDetails) {
+        String email=userDetails.getUsername();
+        return ApiResponse.ok(guestbookService.isLike(likeRequest,email));
     }
 }

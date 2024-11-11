@@ -12,10 +12,10 @@ import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
 import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.repository.MemberRepository;
-import jakarta.transaction.Transactional;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -48,6 +48,22 @@ public class GuestbookServiceImpl implements GuestbookService {
             guestbook.incrementLikes(); //방명록 좋아요 수 업데이트
         }
 
+    }
+
+    @Override
+    @Transactional(readOnly=true)
+    public boolean isLike(LikeRequest likeRequest, String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        Home home=homeRepository.findById(likeRequest.getHomeId())
+                .orElseThrow(HomeNotFoundException::new);
+
+        Guestbook guestbook=guestbookRepository.findByHome(home)
+                .orElseThrow(GuestbookNotFoundException::new);
+
+        Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home);
+        return likeFind != null;
     }
 
 }
