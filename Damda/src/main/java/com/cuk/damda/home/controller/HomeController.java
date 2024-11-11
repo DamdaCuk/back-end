@@ -2,8 +2,8 @@ package com.cuk.damda.home.controller;
 
 import com.cuk.damda.global.controller.ApiResponse;
 import com.cuk.damda.home.controller.request.HomeNameRequest;
+import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.service.HomeService;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,8 +21,12 @@ public class HomeController {
     private final HomeService homeService;
 
     @PostMapping("/create")
-    public ApiResponse<?> createHome(@RequestBody HomeNameRequest homeNameRequest, @AuthenticationPrincipal UserDetails user) {
-        homeService.createHome(homeNameRequest.homeName(), user.getUsername());
+    public ApiResponse<?> createHome(@RequestBody HomeNameRequest homeNameRequest
+            , @AuthenticationPrincipal UserDetails user
+    ) {
+        Home home = homeService.createHome(homeNameRequest.homeName());
+        homeService.memberInsertHome(home, user.getUsername());
+
         return ApiResponse.of(HttpStatus.CREATED, "success");
     }
 }

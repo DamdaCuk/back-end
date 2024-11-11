@@ -24,6 +24,7 @@ public class Contents extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ItemType itemType;
+
     private String itemTitle;
     private String itemImg;
 

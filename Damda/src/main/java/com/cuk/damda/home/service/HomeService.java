@@ -1,5 +1,8 @@
 package com.cuk.damda.home.service;
 
+import com.cuk.damda.home.domain.Home;
+
 public interface HomeService {
-    void createHome(String homeName, String userName);
+    void memberInsertHome(Home home, String userName);
+    Home createHome(String homeName);
 }
