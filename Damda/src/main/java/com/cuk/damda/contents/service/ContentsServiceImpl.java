@@ -49,17 +49,21 @@ public class ContentsServiceImpl implements ContentsService {
     }
     @Override
     public ReviewResponse addAndUpdateReview(Long contentId, ReviewRequest reviewRequest) {
-        // 1. `homeId`와 `contentId`에 해당하는 콘텐츠 조회
+        // 1. `contentId`에 해당하는 콘텐츠 조회
         Contents content = contentsRepository.findById(contentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 콘텐츠를 찾을 수 없습니다."));
 
-        // 2. 리뷰가 있는 경우 업데이트, 없는 경우 추가
-        if (content.getReview() != null) {
-            // 이미 리뷰가 있는 경우 업데이트
-            content.review(reviewRequest.review());
-            content.rating(reviewRequest.rating());
+        // 2. 리뷰나 평점 중 하나라도 존재하는 경우 업데이트, 둘 다 없으면 추가
+        if (content.getReview() != null || content.getRating() != null) {
+            // 이미 리뷰나 평점이 있는 경우 개별적으로 업데이트
+            if (reviewRequest.review() != null) {
+                content.review(reviewRequest.review()); // 리뷰 업데이트
+            }
+            if (reviewRequest.rating() != null) {
+                content.rating(reviewRequest.rating()); // 평점 업데이트
+            }
         } else {
-            // 리뷰가 없는 경우 추가
+            // 리뷰와 평점이 모두 없는 경우 추가
             content.addReview(reviewRequest.review(), reviewRequest.rating());
         }
         // 3. 변경사항 저장
