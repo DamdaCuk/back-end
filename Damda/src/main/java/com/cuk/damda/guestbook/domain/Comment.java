@@ -6,15 +6,15 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name="guest_book_tb")
+@Table(name="comment_tb")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class Guestbook extends BaseEntity {
+public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long guestbookId;
+    private Long commentId;
     @Column(columnDefinition = "TEXT")
     private String comment;
 
@@ -23,13 +23,15 @@ public class Guestbook extends BaseEntity {
     private Home home;
 
     @Builder
-    public Guestbook(String comment){
+    public Comment(String comment, Home home){
         this.comment=comment;
+        this.home=home;
     }
 
-    public static Guestbook create(String comment){
-        return Guestbook.builder()
+    public static Comment create(String comment, Home home){
+        return Comment.builder()
                 .comment(comment)
+                .home(home)
                 .build();
     }
 }
