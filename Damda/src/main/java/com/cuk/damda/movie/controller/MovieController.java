@@ -15,8 +15,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/movie")
 public class MovieController {
-    @Autowired
-    private MovieService movieService;
+
+    private final MovieService movieService;
 
     @GetMapping("/search")
     public ApiResponse<List<MovieListResponse>> getMovieList(@RequestParam("title") String title, @RequestParam("page") int page){
