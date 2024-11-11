@@ -19,11 +19,12 @@ public class GuestbookController {
     private final GuestbookService guestbookService;
 
     @PostMapping("/like/add")
-    public void addLike(@RequestBody LikeRequest likeRequest
+    public ApiResponse<?> addLike(@RequestBody LikeRequest likeRequest
             , @AuthenticationPrincipal UserDetails userDetails
     ) {
         String email=userDetails.getUsername();
         guestbookService.addLike(likeRequest, email);
+        return ApiResponse.ok("좋아요를 성공적으로 추가함");
     }
 
     //로그인 한 유저가 해당 홈에 좋아요를 눌렀는지 확인
