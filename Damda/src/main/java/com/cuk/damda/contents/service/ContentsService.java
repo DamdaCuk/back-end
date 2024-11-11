@@ -5,9 +5,8 @@ import com.cuk.damda.contents.controller.response.ReviewResponse;
 
 public interface ContentsService {
 
-    void addReview(Long homeId, Long contentId, ReviewRequest reviewRequest);
-    ReviewResponse searchReview(Long homeId, Long contentId);
-    ReviewResponse updateReview(Long homeId, Long contentId, ReviewRequest reviewRequest);
+    ReviewResponse addAndUpdateReview(Long contentId, ReviewRequest reviewRequest);
+    ReviewResponse searchReview(Long contentId);
 
-    void deleteReview(Long homeId, Long contentId);
+    void deleteReview(Long contentId);
 }

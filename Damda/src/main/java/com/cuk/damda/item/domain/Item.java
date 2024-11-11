@@ -17,7 +17,7 @@ public class Item extends BaseEntity {
     @NotNull
     private String url;
     @NotNull
-    @Enumerated(EnumType.STRING)  //gpt가 enum 타입이 아닌 int 형으로 db에 저장한다고 이거 넣으라고 했음...일단 모르겠음...
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @Builder

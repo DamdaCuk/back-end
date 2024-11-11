@@ -13,7 +13,6 @@ import java.util.Optional;
 @Table(name="contents_tb")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
 @ToString
 public class Contents extends BaseEntity {
 
@@ -23,7 +22,7 @@ public class Contents extends BaseEntity {
 
     private Long itemId;
 
-    @Enumerated(EnumType.STRING) //gpt에서 enum 타입의 string이 아닌 int로 저장한다고 해서 일단 붙여놓음....나도 잘 모름
+    @Enumerated(EnumType.STRING)
     private ItemType itemType;
     private String itemTitle;
     private String itemImg;
@@ -59,5 +58,11 @@ public class Contents extends BaseEntity {
     public void addReview(String review, Rating rating) {
         this.review = review;
         this.rating = rating;
+    }
+    public void review(String review) {
+        this.review = review;
+    }
+    public void rating(Rating rating) {
+        this.review = review;
     }
 }

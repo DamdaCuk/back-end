@@ -11,31 +11,25 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/{homeId}/contents")
+@RequestMapping()
 public class ContentsController {
     private final ContentsService contentsService;
 
     @PostMapping("/{contentId}/review")
-    public ApiResponse<?> addReview(@PathVariable Long homeId, @PathVariable Long contentId, @RequestBody ReviewRequest reviewRequest){
-        contentsService.addReview(homeId,contentId,reviewRequest);
-        return ApiResponse.of(HttpStatus.CREATED,"success");
+    public ApiResponse<?> addAndUpdateReview(@PathVariable Long contentId, @RequestBody ReviewRequest reviewRequest){
+        ReviewResponse reviewResponse = contentsService.addAndUpdateReview(contentId,reviewRequest);
+        return ApiResponse.of(HttpStatus.CREATED,"success", reviewResponse);
     }
 
     @GetMapping("{contentId}/review")
-    public ApiResponse<?> searchReview(@PathVariable Long homeId,@PathVariable Long contentId){
-        ReviewResponse reviewResponse = contentsService.searchReview(homeId, contentId);
+    public ApiResponse<?> searchReview(@PathVariable Long contentId){
+        ReviewResponse reviewResponse = contentsService.searchReview(contentId);
         return ApiResponse.of(HttpStatus.OK,"success",reviewResponse);
     }
 
-    @PatchMapping("/{contentId}/review")
-    public ApiResponse<ReviewResponse> updateReviewAndRating(@PathVariable Long homeId,@PathVariable Long contentId, @RequestBody ReviewRequest updateRequest) {
-        ReviewResponse updatedReview = contentsService.updateReview(homeId, contentId, updateRequest);
-        return ApiResponse.of(HttpStatus.OK, "Review and rating updated successfully", updatedReview);
-    }
-
     @DeleteMapping("/{contentId}/review")
-    public ApiResponse<?> deleteReview(@PathVariable Long homeId,@PathVariable Long contentId){
-        contentsService.deleteReview(homeId, contentId);
+    public ApiResponse<?> deleteReview(@PathVariable Long contentId){
+        contentsService.deleteReview(contentId);
         return ApiResponse.of(HttpStatus.OK, "Review and rating deleted successfully");
     }
 }
