@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GuestbookController {
     private final GuestbookService guestbookService;
 
-    @PostMapping
+    @PostMapping("/like/add")
     public void addLike(@RequestBody LikeRequest likeRequest, @AuthenticationPrincipal UserDetails userDetails) {
         String email=userDetails.getUsername();
         guestbookService.addLike(likeRequest, email);
