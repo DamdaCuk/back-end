@@ -6,4 +6,6 @@ public interface GuestbookService {
     void addLike(LikeRequest likeRequest, String email);
 
     boolean isLike(LikeRequest likeRequest, String email);
+
+    void deleteLike(LikeRequest likeRequest, String email);
 }

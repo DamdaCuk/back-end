@@ -30,4 +30,11 @@ public class GuestbookController {
         String email=userDetails.getUsername();
         return ApiResponse.ok(guestbookService.isLike(likeRequest,email));
     }
+
+    @PostMapping("/like/delete")
+    public ApiResponse<?> deleteLike(@RequestBody LikeRequest likeRequest, @AuthenticationPrincipal UserDetails userDetails) {
+        String email=userDetails.getUsername();
+        guestbookService.deleteLike(likeRequest, email);
+        return ApiResponse.ok("성공적으로 좋아요를 취소함");
+    }
 }

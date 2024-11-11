@@ -36,4 +36,8 @@ public class Guestbook extends BaseEntity {
     public void incrementLikes(){
         this.likes++;
     }
+
+    public void decrementLikes(){
+        this.likes--;
+    }
 }

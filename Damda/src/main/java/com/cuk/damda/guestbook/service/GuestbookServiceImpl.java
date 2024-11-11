@@ -12,7 +12,6 @@ import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
 import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.repository.MemberRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,4 +65,24 @@ public class GuestbookServiceImpl implements GuestbookService {
         return likeFind != null;
     }
 
+    @Override
+    public void deleteLike(LikeRequest likeRequest, String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        Home home=homeRepository.findById(likeRequest.getHomeId())
+                .orElseThrow(HomeNotFoundException::new);
+
+        Guestbook guestbook=guestbookRepository.findByHome(home)
+                .orElseThrow(GuestbookNotFoundException::new);
+
+        Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home);
+
+        if(likeFind==null) {
+            throw new RuntimeException("좋아요를 누른 기록이 존재하지 않습니다.");
+        }else{ //좋아요를 누른 기록이 있는 경우 좋아요 취소 가능
+            likesRepository.delete(likeFind);
+            guestbook.decrementLikes(); //방명록 좋아요 수 업데이트
+        }
+    }
 }
