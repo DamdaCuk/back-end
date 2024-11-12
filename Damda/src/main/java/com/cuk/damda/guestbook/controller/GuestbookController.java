@@ -2,11 +2,15 @@ package com.cuk.damda.guestbook.controller;
 
 import com.cuk.damda.global.controller.ApiResponse;
 import com.cuk.damda.guestbook.controller.request.CommentRequest;
+import com.cuk.damda.guestbook.controller.request.GetCommentRequest;
+import com.cuk.damda.guestbook.controller.response.GetCommentsResponse;
 import com.cuk.damda.guestbook.service.GuestbookService;
 import com.cuk.damda.member.domain.Member;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +27,11 @@ public class GuestbookController {
             , @AuthenticationPrincipal UserDetails userDetails) {
         guestbookService.addComment(commentRequest, userDetails.getUsername());
         return ApiResponse.ok("success");
+    }
+
+    @GetMapping("/comment")
+    public ApiResponse<?> getComments(@RequestBody GetCommentRequest getCommentRequest) {
+        List<GetCommentsResponse> response=guestbookService.getComments(getCommentRequest);
+        return ApiResponse.ok(response);
     }
 }

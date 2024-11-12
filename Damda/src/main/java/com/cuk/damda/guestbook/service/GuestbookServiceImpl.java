@@ -2,12 +2,16 @@ package com.cuk.damda.guestbook.service;
 
 import com.cuk.damda.global.exception.exceptions.DBError;
 import com.cuk.damda.guestbook.controller.request.CommentRequest;
+import com.cuk.damda.guestbook.controller.request.GetCommentRequest;
+import com.cuk.damda.guestbook.controller.response.GetCommentsResponse;
 import com.cuk.damda.guestbook.domain.Comment;
 import com.cuk.damda.guestbook.repository.CommentRepository;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
 import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.repository.MemberRepository;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,5 +36,21 @@ public class GuestbookServiceImpl implements GuestbookService {
         if(!Objects.equals(save.getComment(), commentRequest.comment())){
             throw new DBError("댓글 저장 실패");
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<GetCommentsResponse> getComments(GetCommentRequest getCommentRequest) {
+        Home home=homeRepository.findById(getCommentRequest.homeId())
+                .orElseThrow(RuntimeException::new); //나중에 HomeNotFound로 변경
+
+        List<Comment>comments= commentRepository.findByHome(home);
+        List<GetCommentsResponse>result=new ArrayList<>();
+
+        for(Comment comment:comments){
+            GetCommentsResponse commentResponse=GetCommentsResponse.of(comment.getCommentId(), comment.getComment(), comment.getAuthor().getUserId());
+            result.add(commentResponse);
+        }
+        return result;
     }
 }
