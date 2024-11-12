@@ -3,6 +3,7 @@ package com.cuk.damda.guestbook.service;
 import com.cuk.damda.global.exception.exceptions.DBError;
 import com.cuk.damda.guestbook.controller.request.CommentRequest;
 import com.cuk.damda.guestbook.controller.request.GetCommentRequest;
+import com.cuk.damda.guestbook.controller.request.UpdateCommentRequest;
 import com.cuk.damda.guestbook.controller.response.GetCommentsResponse;
 import com.cuk.damda.guestbook.domain.Comment;
 import com.cuk.damda.guestbook.repository.CommentRepository;
@@ -10,6 +11,7 @@ import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
 import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.repository.MemberRepository;
+import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +25,7 @@ public class GuestbookServiceImpl implements GuestbookService {
     private final CommentRepository commentRepository;
     private final HomeRepository homeRepository;
     private final MemberRepository memberRepository;
+    private final EntityManager em;
 
     @Override
     @Transactional
@@ -52,5 +55,16 @@ public class GuestbookServiceImpl implements GuestbookService {
             result.add(commentResponse);
         }
         return result;
+    }
+
+    @Override
+    public void updateComment(UpdateCommentRequest updateCommentRequest, String userEmail) {
+        Comment comment=em.find(Comment.class,updateCommentRequest.commentId());
+        if(comment.getAuthor().getEmail().equals(userEmail)){ //작성자가 로그인 한 유저라면
+            comment.updateComment(updateCommentRequest.comment());
+        }else{
+            throw new RuntimeException("로그인 한 유저와 댓글을 작성한 유저가 다릅니다.");
+        }
+        em.close();
     }
 }
