@@ -58,6 +58,7 @@ public class GuestbookServiceImpl implements GuestbookService {
     }
 
     @Override
+    @Transactional
     public void updateComment(UpdateCommentRequest updateCommentRequest, String userEmail) {
         Comment comment=em.find(Comment.class,updateCommentRequest.commentId());
         if(comment.getAuthor().getEmail().equals(userEmail)){ //작성자가 로그인 한 유저라면
