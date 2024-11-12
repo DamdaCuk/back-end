@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -33,10 +34,9 @@ public class MovieServiceImpl implements MovieService {
      * @param apiId
      */
     @Override
+    @Transactional
     public void addMovieContents(int apiId) {
         // TODO :: home 테스트 용 코드 -> 추후 수정
-//        Home testHome = Home.create(0L,0L);
-//        homeRepository.save(testHome);
         Home testHome = homeRepository.findByHomeId(2L)
                 .orElseThrow(() -> new IllegalArgumentException("home을 찾을 수 없습니다."));
 
@@ -84,6 +84,7 @@ public class MovieServiceImpl implements MovieService {
      * @return 영화 리스트
      */
     @Override
+    @Transactional(readOnly = true)
     public List<MovieListResponse> getMovieList(String title, int page) {
         //API 주소
         String url = "/search/movie?query=" + title + "&language=ko-kr&page=" + page;
@@ -116,6 +117,7 @@ public class MovieServiceImpl implements MovieService {
      * @param contentsId
      */
     @Override
+    @Transactional
     public void deleteMovieContents(Long contentsId) {
         Contents deleteContents = contentsRepository.findById(contentsId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컨텐츠입니다."));
