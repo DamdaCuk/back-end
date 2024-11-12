@@ -3,7 +3,6 @@ package com.cuk.damda.guestbook.service;
 import com.cuk.damda.global.exception.exceptions.DBError;
 import com.cuk.damda.guestbook.controller.request.CommentRequest;
 import com.cuk.damda.guestbook.controller.request.DeleteCommentRequest;
-import com.cuk.damda.guestbook.controller.request.GetCommentRequest;
 import com.cuk.damda.guestbook.controller.request.UpdateCommentRequest;
 import com.cuk.damda.guestbook.controller.response.GetCommentsResponse;
 import com.cuk.damda.guestbook.domain.Comment;
@@ -44,8 +43,8 @@ public class GuestbookServiceImpl implements GuestbookService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GetCommentsResponse> getComments(GetCommentRequest getCommentRequest) {
-        Home home=homeRepository.findById(getCommentRequest.homeId())
+    public List<GetCommentsResponse> getComments(Long homeId) {
+        Home home=homeRepository.findById(homeId)
                 .orElseThrow(RuntimeException::new); //나중에 HomeNotFound로 변경
 
         List<Comment>comments= commentRepository.findByHome(home);

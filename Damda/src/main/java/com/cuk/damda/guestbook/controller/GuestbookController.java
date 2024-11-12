@@ -3,7 +3,6 @@ package com.cuk.damda.guestbook.controller;
 import com.cuk.damda.global.controller.ApiResponse;
 import com.cuk.damda.guestbook.controller.request.CommentRequest;
 import com.cuk.damda.guestbook.controller.request.DeleteCommentRequest;
-import com.cuk.damda.guestbook.controller.request.GetCommentRequest;
 import com.cuk.damda.guestbook.controller.request.UpdateCommentRequest;
 import com.cuk.damda.guestbook.controller.response.GetCommentsResponse;
 import com.cuk.damda.guestbook.service.GuestbookService;
@@ -13,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,9 +32,9 @@ public class GuestbookController {
         return ApiResponse.ok("success");
     }
 
-    @GetMapping("/comment")
-    public ApiResponse<?> getComments(@RequestBody GetCommentRequest getCommentRequest) {
-        List<GetCommentsResponse> response=guestbookService.getComments(getCommentRequest);
+    @GetMapping("/comment/{homeId}")
+    public ApiResponse<?> getComments(@PathVariable Long homeId) {
+        List<GetCommentsResponse> response=guestbookService.getComments(homeId);
         return ApiResponse.ok(response);
     }
 
