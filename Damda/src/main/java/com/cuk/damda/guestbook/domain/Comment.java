@@ -2,6 +2,7 @@ package com.cuk.damda.guestbook.domain;
 
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.global.domain.BaseEntity;
+import com.cuk.damda.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,16 +23,22 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "home_id", nullable = false)
     private Home home;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Member author;
+
     @Builder
-    public Comment(String comment, Home home){
+    public Comment(String comment, Home home, Member author) {
         this.comment=comment;
         this.home=home;
+        this.author=author;
     }
 
-    public static Comment create(String comment, Home home){
+    public static Comment create(String comment, Home home, Member author) {
         return Comment.builder()
                 .comment(comment)
                 .home(home)
+                .author(author)
                 .build();
     }
 }
