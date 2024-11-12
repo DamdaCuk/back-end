@@ -16,14 +16,14 @@ public class MusicController {
 
     private final MusicService musicService;
 
-    @PostMapping("/search")
-    public ApiResponse<?> searchMusic(@RequestBody MusicSearchRequest musicSearchRequest) {
+    @GetMapping("/search")
+    public ApiResponse<List<ManiaDBDTO>> searchMusic(@RequestBody MusicSearchRequest musicSearchRequest) {
         List<ManiaDBDTO> musics = musicService.searchToManiaDB(musicSearchRequest);
         return ApiResponse.ok(musics);
     }
 
-    @GetMapping
-    public ApiResponse<?> addMusic(@RequestBody ManiaDBDTO maniaDBDTO) {
+    @PostMapping
+    public ApiResponse<String> addMusic(@RequestBody ManiaDBDTO maniaDBDTO) {
         musicService.addMusicContents(maniaDBDTO);
         return ApiResponse.of(HttpStatus.CREATED, "success");
     }
