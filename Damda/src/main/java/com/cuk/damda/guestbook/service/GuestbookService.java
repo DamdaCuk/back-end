@@ -1,6 +1,7 @@
 package com.cuk.damda.guestbook.service;
 
 import com.cuk.damda.guestbook.controller.request.CommentRequest;
+import com.cuk.damda.guestbook.controller.request.DeleteCommentRequest;
 import com.cuk.damda.guestbook.controller.request.GetCommentRequest;
 import com.cuk.damda.guestbook.controller.request.UpdateCommentRequest;
 import com.cuk.damda.guestbook.controller.response.GetCommentsResponse;
@@ -13,4 +14,6 @@ public interface GuestbookService {
     List<GetCommentsResponse> getComments(GetCommentRequest getCommentRequest);
 
     void updateComment(UpdateCommentRequest updateCommentRequest, String userEmail);
+
+    void deleteComment(DeleteCommentRequest deleteCommentRequest, String username);
 }
