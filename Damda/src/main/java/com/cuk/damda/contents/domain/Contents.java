@@ -22,7 +22,7 @@ public class Contents extends BaseEntity {
 
     private Long itemId;
 
-    //@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private ItemType itemType;
 
     private String itemTitle;
