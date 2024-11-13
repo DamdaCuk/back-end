@@ -22,7 +22,7 @@ public class Contents extends BaseEntity {
 
     private Long itemId;
 
-    //@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private ItemType itemType;
 
     private String itemTitle;
@@ -54,5 +54,16 @@ public class Contents extends BaseEntity {
                 .itemImg(itemImg)
                 .home(home)
                 .build();
+    }
+
+    public void addReview(String review, Rating rating) {
+        this.review = review;
+        this.rating = rating;
+    }
+    public void review(String review) {
+        this.review = review;
+    }
+    public void rating(Rating rating) {
+        this.review = review;
     }
 }
