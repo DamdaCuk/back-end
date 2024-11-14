@@ -15,4 +15,6 @@ import java.util.Optional;
 public interface ContentsRepository extends JpaRepository<Contents, Long> {
     Optional<Contents> findByItemIdAndHomeAndItemType(Long itemId, Home home, ItemType itemType);
     Slice<Contents> findByHomeAndItemType(Pageable pageable, Home home, ItemType itemType);
+
+    List<Contents> findByItemTitleAndItemType(String title, ItemType itemType);
 }
