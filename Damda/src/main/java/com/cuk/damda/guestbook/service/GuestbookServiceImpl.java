@@ -28,7 +28,7 @@ public class GuestbookServiceImpl implements GuestbookService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
-        Home home=homeRepository.findById(likeRequest.getHomeId())
+        Home home=homeRepository.findById(likeRequest.homeId())
                 .orElseThrow(HomeNotFoundException::new);
 
         Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home)
@@ -51,7 +51,7 @@ public class GuestbookServiceImpl implements GuestbookService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
-        Home home=homeRepository.findById(likeRequest.getHomeId())
+        Home home=homeRepository.findById(likeRequest.homeId())
                 .orElseThrow(HomeNotFoundException::new);
 
         Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home)
@@ -64,7 +64,7 @@ public class GuestbookServiceImpl implements GuestbookService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
-        Home home=homeRepository.findById(likeRequest.getHomeId())
+        Home home=homeRepository.findById(likeRequest.homeId())
                 .orElseThrow(HomeNotFoundException::new);
 
 
