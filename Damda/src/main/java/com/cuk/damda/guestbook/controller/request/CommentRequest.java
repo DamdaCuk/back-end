@@ -1,9 +1,7 @@
 package com.cuk.damda.guestbook.controller.request;
 
-import lombok.Getter;
-
-public record LikeRequest (
+public record CommentRequest(
+        String comment,
         Long homeId
-){
-
+) {
 }
