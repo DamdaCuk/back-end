@@ -1,10 +1,8 @@
 package com.cuk.damda.guestbook.service;
 
-import com.cuk.damda.global.exception.exceptions.GuestbookNotFoundException;
 import com.cuk.damda.global.exception.exceptions.HomeNotFoundException;
 import com.cuk.damda.global.exception.exceptions.UserNotFoundException;
 import com.cuk.damda.guestbook.controller.request.LikeRequest;
-import com.cuk.damda.guestbook.domain.Guestbook;
 import com.cuk.damda.guestbook.domain.Likes;
 import com.cuk.damda.guestbook.repository.GuestbookRepository;
 import com.cuk.damda.guestbook.repository.LikesRepository;
@@ -33,7 +31,8 @@ public class GuestbookServiceImpl implements GuestbookService {
         Home home=homeRepository.findById(likeRequest.getHomeId())
                 .orElseThrow(HomeNotFoundException::new);
 
-        Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home);
+        Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home)
+                .orElseThrow(()->new IllegalArgumentException("좋아요를 누른 기록이 존재하지 않습니다."));
 
         if(likeFind!=null) {
             throw new RuntimeException("이미 좋아요를 눌렀습니다.");
@@ -55,7 +54,8 @@ public class GuestbookServiceImpl implements GuestbookService {
         Home home=homeRepository.findById(likeRequest.getHomeId())
                 .orElseThrow(HomeNotFoundException::new);
 
-        Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home);
+        Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home)
+                .orElseThrow(()->new IllegalArgumentException("좋아요를 누른 기록이 존재하지 않습니다."));
         return likeFind != null;
     }
 
@@ -68,7 +68,8 @@ public class GuestbookServiceImpl implements GuestbookService {
                 .orElseThrow(HomeNotFoundException::new);
 
 
-        Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home);
+        Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home)
+                .orElseThrow(()->new IllegalArgumentException("좋아요를 누른 기록이 존재하지 않습니다."));
 
         if(likeFind==null) {
             throw new RuntimeException("좋아요를 누른 기록이 존재하지 않습니다.");
