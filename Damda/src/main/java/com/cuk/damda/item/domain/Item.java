@@ -17,6 +17,7 @@ public class Item extends BaseEntity {
     @NotNull
     private String url;
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @Builder

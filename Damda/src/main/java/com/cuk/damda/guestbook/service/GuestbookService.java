@@ -6,7 +6,14 @@ import com.cuk.damda.guestbook.controller.request.UpdateCommentRequest;
 import com.cuk.damda.guestbook.controller.response.GetCommentsResponse;
 import java.util.List;
 
+import com.cuk.damda.guestbook.controller.request.LikeRequest;
+
 public interface GuestbookService {
+    void addLike(LikeRequest likeRequest, String email);
+
+    boolean isLike(LikeRequest likeRequest, String email);
+
+    void deleteLike(LikeRequest likeRequest, String email);
 
     void addComment(CommentRequest commentRequest, String username);
 
