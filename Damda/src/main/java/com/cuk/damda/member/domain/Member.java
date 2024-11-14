@@ -21,11 +21,12 @@ public class Member extends BaseEntity implements UserDetails {
 
     private String username;
 
+    @Column(name="email")
     private String email;
 
     private String provider; //공급자
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "home_id") //null 허용(처음 계정을 만든 사용자)
     private Home home;
 
@@ -50,6 +51,10 @@ public class Member extends BaseEntity implements UserDetails {
                 .email(email)
                 .provider(provider)
                 .build();
+    }
+
+    public void updateHome(Home home) {
+        this.home=home;
     }
 
     @Override
