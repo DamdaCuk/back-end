@@ -29,9 +29,4 @@ public class MovieController {
         return ApiResponse.of(HttpStatus.CREATED, "success");
     }
 
-    @DeleteMapping("/{contentsId}")
-    public ApiResponse<Long> deleteMovie(@PathVariable Long contentsId){
-        movieService.deleteMovieContents(contentsId);
-        return ApiResponse.ok(contentsId);
-    }
 }

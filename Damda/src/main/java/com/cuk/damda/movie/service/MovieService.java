@@ -9,5 +9,4 @@ import java.util.Optional;
 public interface MovieService {
     List<MovieListResponse> getMovieList(String title, int page);
     void addMovieContents(int apiId);
-    void deleteMovieContents(Long contentsId);
 }

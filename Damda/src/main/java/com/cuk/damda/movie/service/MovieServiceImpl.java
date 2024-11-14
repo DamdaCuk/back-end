@@ -113,18 +113,6 @@ public class MovieServiceImpl implements MovieService {
     }
 
     /**
-     * contents에서 영화 삭제
-     * @param contentsId
-     */
-    @Override
-    @Transactional
-    public void deleteMovieContents(Long contentsId) {
-        Contents deleteContents = contentsRepository.findById(contentsId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컨텐츠입니다."));
-        contentsRepository.delete(deleteContents);
-    }
-
-    /**
      * 영화 상세 정보 조회(외부 api)
      * @param apiId
      * @return

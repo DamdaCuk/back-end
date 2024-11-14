@@ -80,7 +80,7 @@ public class BookServiceImpl implements BookService {
 
         if(bookEntity == null) {
             //없으면 api에서 정보탐색
-            log.info("API에서 탐색!!");
+            log.info("DB에 저장");
 
             Book apiEntity = Book.create(
                 bookDto.isbn(),
@@ -108,14 +108,6 @@ public class BookServiceImpl implements BookService {
         }
 
         contentsRepository.save(contents);
-    }
-
-    @Override
-    @Transactional
-    public void deleteBookContents(Long contentsId) {
-        Contents deleteContents = contentsRepository.findById(contentsId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컨텐츠입니다."));
-        contentsRepository.delete(deleteContents);
     }
 
     /**

@@ -16,7 +16,7 @@ public class MusicController {
 
     private final MusicService musicService;
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ApiResponse<List<ManiaDBDTO>> searchMusic(@RequestBody MusicSearchRequest musicSearchRequest) {
         List<ManiaDBDTO> musics = musicService.searchToManiaDB(musicSearchRequest);
         return ApiResponse.ok(musics);
@@ -28,9 +28,4 @@ public class MusicController {
         return ApiResponse.of(HttpStatus.CREATED, "success");
     }
 
-    @DeleteMapping("/{contentsId}")
-    public ApiResponse<Long> deleteMusic(@PathVariable Long contentsId){
-        musicService.deleteMusicContents(contentsId);
-        return ApiResponse.ok(contentsId);
-    }
 }

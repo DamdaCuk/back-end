@@ -43,4 +43,11 @@ public class ContentsServiceImpl implements ContentsService {
 
         return contentsListResponses;
     }
+
+    @Override
+    public void deleteContents(Long contentsId) {
+        Contents deleteContents = contentsRepository.findById(contentsId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컨텐츠입니다."));
+        contentsRepository.delete(deleteContents);
+    }
 }

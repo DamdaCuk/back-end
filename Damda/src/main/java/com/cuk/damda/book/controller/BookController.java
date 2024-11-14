@@ -29,12 +29,6 @@ public class BookController {
         bookService.addBookContents(homeId, bookDetailsDto);
         return ApiResponse.of(HttpStatus.CREATED, "success");
     }
-
-    @DeleteMapping("/{contentsId}")
-    public ApiResponse<Long> deleteMusic(@PathVariable Long contentsId){
-        bookService.deleteBookContents(contentsId);
-        return ApiResponse.ok(contentsId);
-    }
 }
 
 

@@ -26,4 +26,10 @@ public class ContentsController {
         ItemType type = ItemType.valueOf(itemType.toUpperCase());
         return ApiResponse.ok(contentsService.getContentsList(page, size, homeId, type));
     }
+
+    @DeleteMapping("/{contentsId}")
+    public ApiResponse<Long> deleteContents(@PathVariable Long contentsId){
+        contentsService.deleteContents(contentsId);
+        return ApiResponse.ok(contentsId);
+    }
 }
