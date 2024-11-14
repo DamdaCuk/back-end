@@ -17,7 +17,6 @@ public class Guestbook extends BaseEntity {
     private Long guestbookId;
     @Column(columnDefinition = "TEXT")
     private String comment;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_id", nullable = false)
     private Home home;
