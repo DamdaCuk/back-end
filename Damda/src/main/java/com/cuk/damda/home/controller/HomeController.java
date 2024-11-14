@@ -6,6 +6,9 @@ import com.cuk.damda.home.controller.response.HomeResponse;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.service.HomeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,8 +34,12 @@ public class HomeController {
     }
 
     @GetMapping("/search")
-    public ApiResponse<?> searchHome(@RequestParam String title, @RequestParam String contentType){
-        List<HomeResponse> homeDetailsList = homeService.searchHome(title, contentType);
-        return ApiResponse.of(HttpStatus.OK, "success", homeDetailsList);
+    public ApiResponse<?> searchHome(
+            @RequestParam String title,
+            @RequestParam String contentType,
+            @PageableDefault(size = 10) Pageable pageable) {
+
+        Page<HomeResponse> homeResponses = homeService.searchHomes(title, contentType, pageable);
+        return ApiResponse.of(HttpStatus.OK, "success", homeResponses);
     }
 }

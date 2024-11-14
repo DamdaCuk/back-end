@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -64,12 +66,12 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
-    public List<HomeResponse> searchHome(String title, String contentType) {
-        List<Contents> contentsList = contentsRepository.findByItemTitleAndItemType(title, ItemType.valueOf(contentType));
-        return contentsList.stream()
-                .map(Contents::getHome)
-                .distinct()
-                .map(home -> new HomeResponse(home.getHomeId(),home.getHomeName(), home.getLikes()))
-                .collect(Collectors.toList());
+    public Page<HomeResponse> searchHomes(String title, String contentType, Pageable pageable) {
+        Page<Contents> contentsPage = contentsRepository.findByItemTitleAndItemType(title, ItemType.valueOf(contentType), pageable);
+        return contentsPage.map(contents -> new HomeResponse(
+                contents.getHome().getHomeId(),
+                contents.getHome().getHomeName(),
+                contents.getHome().getLikes()
+        ));
     }
 }
