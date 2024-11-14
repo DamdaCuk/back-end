@@ -1,7 +1,11 @@
 package com.cuk.damda.home.service;
 
+import com.cuk.damda.contents.domain.Contents;
+import com.cuk.damda.contents.domain.Enum.ItemType;
+import com.cuk.damda.contents.repository.ContentsRepository;
 import com.cuk.damda.global.exception.exceptions.DBError;
 import com.cuk.damda.global.exception.exceptions.UserNotFound;
+import com.cuk.damda.home.controller.response.HomeResponse;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
 import com.cuk.damda.member.domain.Member;
@@ -10,7 +14,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -20,6 +28,7 @@ public class HomeServiceImpl implements HomeService {
     private final HomeRepository homeRepository;
     private final MemberRepository memberRepository;
     private final EntityManager em;
+    private final ContentsRepository contentsRepository;
 
     @Override
     @Transactional
@@ -54,5 +63,15 @@ public class HomeServiceImpl implements HomeService {
             throw new DBError("create home failed");
         }
         return home;
+    }
+
+    @Override
+    public Page<HomeResponse> searchHomes(String title, String contentType, Pageable pageable) {
+        Page<Contents> contentsPage = contentsRepository.findByItemTitleAndItemType(title, ItemType.valueOf(contentType), pageable);
+        return contentsPage.map(contents -> new HomeResponse(
+                contents.getHome().getHomeId(),
+                contents.getHome().getHomeName(),
+                contents.getHome().getLikes()
+        ));
     }
 }
