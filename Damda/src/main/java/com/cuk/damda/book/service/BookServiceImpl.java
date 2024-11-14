@@ -1,11 +1,21 @@
 //작동 되는 코드 쥬아~~~
 package com.cuk.damda.book.service;
 
-import com.cuk.damda.book.controller.response.BookListResponse;
+import com.cuk.damda.book.controller.dto.BookDetailsDto;
+import com.cuk.damda.book.domain.Book;
+import com.cuk.damda.book.repository.BookRepository;
+import com.cuk.damda.contents.domain.Contents;
+import com.cuk.damda.contents.domain.Enum.ItemType;
+import com.cuk.damda.contents.repository.ContentsRepository;
+import com.cuk.damda.home.domain.Home;
+import com.cuk.damda.home.repository.HomeRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,8 +30,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
+@Slf4j
 @Service
-public class BookServiceImpl {
+public class BookServiceImpl implements BookService {
+
+    private final HomeRepository homeRepository;
+    private final BookRepository bookRepository;
+    private final ContentsRepository contentsRepository;
 
     private final String apiUrl = "https://openapi.naver.com/v1/search/book.json";
 
@@ -31,7 +47,9 @@ public class BookServiceImpl {
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String clientSecret;
 
-    public List<BookListResponse> searchBookByTitle(String title, int start) {
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookDetailsDto> searchBookByTitle(String title, int start) {
         String encodedTitle;
         try {
             encodedTitle = URLEncoder.encode(title, "UTF-8");
@@ -49,6 +67,52 @@ public class BookServiceImpl {
         String response = get(requestUrl, requestHeaders);
         return parseBookListResponse(response);  // 파싱 후 결과 반환
     }
+
+    @Override
+    @Transactional
+    public void addBookContents(Long homeId, BookDetailsDto bookDto) {
+
+        Home testHome = homeRepository.findByHomeId(homeId)
+                .orElseThrow(() -> new IllegalArgumentException("home을 찾을 수 없습니다."));
+
+        //DB에 book 정보 탐색
+        Book bookEntity = bookRepository.findByIsbn(bookDto.isbn()).orElse(null);
+
+        if(bookEntity == null) {
+            //없으면 api에서 정보탐색
+            log.info("DB에 저장");
+
+            Book apiEntity = Book.create(
+                bookDto.isbn(),
+                bookDto.title(),
+                bookDto.author(),
+                bookDto.publisher(),
+                bookDto.image()
+            );
+            bookEntity = bookRepository.save(apiEntity);
+        }
+
+        Contents contents = Contents.create(
+            bookEntity.getBookId(),
+            ItemType.BOOK,
+            bookEntity.getTitle(),
+            bookEntity.getImage(),
+            testHome
+        );
+
+        //중복 데이터 방지
+        Contents existContent = contentsRepository.findByItemIdAndHomeAndItemType(bookEntity.getBookId(), testHome, ItemType.BOOK)
+                .orElse(null);
+        if(existContent != null) {
+            throw new IllegalArgumentException("이미 저장된 컨텐츠 입니다.");
+        }
+
+        contentsRepository.save(contents);
+    }
+
+    /**
+     *  API 처리
+     */
 
     private String get(String apiUrl, Map<String, String> requestHeaders) {
         HttpURLConnection con = connect(apiUrl);
@@ -94,20 +158,20 @@ public class BookServiceImpl {
         }
     }
 
-    private List<BookListResponse> parseBookListResponse(String responseBody) {
-        List<BookListResponse> bookList = new ArrayList<>();
+    private List<BookDetailsDto> parseBookListResponse(String responseBody) {
+        List<BookDetailsDto> bookList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode root = mapper.readTree(responseBody);
             JsonNode items = root.path("items");
 
             for (JsonNode item : items) {
-                bookList.add(new BookListResponse(
+                bookList.add(BookDetailsDto.from(
+                        item.path("isbn").asText(),
                         item.path("title").asText(),
                         item.path("author").asText(),
                         item.path("publisher").asText(),
-                        item.path("image").asText(),
-                        item.path("description").asText()
+                        item.path("image").asText()
                 ));
             }
         } catch (IOException e) {
@@ -115,6 +179,7 @@ public class BookServiceImpl {
         }
         return bookList;
     }
+
 }
 
 

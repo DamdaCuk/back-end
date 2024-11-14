@@ -109,17 +109,6 @@ public class MusicServiceImpl implements MusicService {
         contentsRepository.save(contennt);
     }
 
-    /**
-     * contents에서 음악 삭제
-     * @param contentsId
-     */
-    @Override
-    public void deleteMusicContents(Long contentsId) {
-        Contents deleteContents = contentsRepository.findById(contentsId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컨텐츠입니다."));
-        contentsRepository.delete(deleteContents);
-    }
-
     public static List<ManiaDBDTO> parseXML(InputStream xmlStream) throws Exception {
         List<ManiaDBDTO> songs = new ArrayList<>();
 

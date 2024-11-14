@@ -49,4 +49,10 @@ public class ContentsController {
         contentsService.deleteReview(contentId);
         return ApiResponse.of(HttpStatus.OK, "Review and rating deleted successfully");
     }
+
+    @DeleteMapping("/{contentsId}")
+    public ApiResponse<Long> deleteContents(@PathVariable Long contentsId){
+        contentsService.deleteContents(contentsId);
+        return ApiResponse.ok(contentsId);
+    }
 }

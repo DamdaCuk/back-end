@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface ContentsService {
     Slice<ContentsListResponse> getContentsList(int page, int size, Long homeId, ItemType itemType);
+    void deleteContents(Long contentsId);
 
     ReviewResponse addAndUpdateReview(Long contentId, ReviewRequest reviewRequest);
     ReviewResponse searchReview(Long contentId);
