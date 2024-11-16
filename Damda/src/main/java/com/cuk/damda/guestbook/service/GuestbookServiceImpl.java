@@ -99,7 +99,7 @@ public class GuestbookServiceImpl implements GuestbookService {
                 .orElseThrow(HomeNotFoundException::new);
 
         Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home)
-                .orElseThrow(()->new IllegalArgumentException("좋아요를 누른 기록이 존재하지 않습니다."));
+                .orElse(null);
 
         if(likeFind!=null) {
             throw new RuntimeException("이미 좋아요를 눌렀습니다.");
@@ -122,7 +122,7 @@ public class GuestbookServiceImpl implements GuestbookService {
                 .orElseThrow(HomeNotFoundException::new);
 
         Likes likeFind = likesRepository.findByLikeGiverAndLikeReceiver(member, home)
-                .orElseThrow(()->new IllegalArgumentException("좋아요를 누른 기록이 존재하지 않습니다."));
+                .orElse(null);
         return likeFind != null;
     }
 
