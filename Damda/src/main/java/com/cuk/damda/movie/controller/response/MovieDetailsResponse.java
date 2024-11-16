@@ -1,21 +1,23 @@
 package com.cuk.damda.movie.controller.response;
 
-import java.util.List;
+import com.cuk.damda.movie.domain.Movie;
 
 public record MovieDetailsResponse(
+        Long movieId,
         String title,
         String posterPath,
         String director,
         String actor,
         String genre
 ) {
-    public static MovieDetailsResponse from(String title, String posterPath, String director, String actor, String genre) {
+    public static MovieDetailsResponse of(Movie movie){
         return new MovieDetailsResponse(
-                title,
-                posterPath,
-                director,
-                actor,
-                genre
+                movie.getMovieId(),
+                movie.getTitle(),
+                movie.getPoster(),
+                movie.getDirector(),
+                movie.getActor(),
+                movie.getGenre()
         );
     }
 }

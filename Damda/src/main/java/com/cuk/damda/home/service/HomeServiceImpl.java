@@ -1,20 +1,22 @@
 package com.cuk.damda.home.service;
 
+import com.cuk.damda.book.repository.BookRepository;
 import com.cuk.damda.contents.domain.Contents;
 import com.cuk.damda.contents.domain.Enum.ItemType;
 import com.cuk.damda.contents.repository.ContentsRepository;
 import com.cuk.damda.global.exception.exceptions.DBError;
 import com.cuk.damda.global.exception.exceptions.UserNotFound;
-import com.cuk.damda.home.controller.response.HomeResponse;
+import com.cuk.damda.home.controller.response.HomeListResponse;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
 import com.cuk.damda.member.domain.Member;
 import com.cuk.damda.member.repository.MemberRepository;
+import com.cuk.damda.movie.repository.MovieRepository;
+import com.cuk.damda.music.repository.MusicRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import java.util.List;
+
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,9 +68,9 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
-    public Page<HomeResponse> searchHomes(String title, String contentType, Pageable pageable) {
-        Page<Contents> contentsPage = contentsRepository.findByItemTitleAndItemType(title, ItemType.valueOf(contentType), pageable);
-        return contentsPage.map(contents -> new HomeResponse(
+    public Page<HomeListResponse> searchHomes(Long itemId, String contentType, Pageable pageable) {
+        Page<Contents> contentsPage = contentsRepository.findByItemIdAndItemType(itemId, ItemType.valueOf(contentType), pageable);
+        return contentsPage.map(contents -> HomeListResponse.from(
                 contents.getHome().getHomeId(),
                 contents.getHome().getHomeName(),
                 contents.getHome().getLikes()

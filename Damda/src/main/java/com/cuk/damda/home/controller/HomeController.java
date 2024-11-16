@@ -2,7 +2,7 @@ package com.cuk.damda.home.controller;
 
 import com.cuk.damda.global.controller.ApiResponse;
 import com.cuk.damda.home.controller.request.HomeNameRequest;
-import com.cuk.damda.home.controller.response.HomeResponse;
+import com.cuk.damda.home.controller.response.HomeListResponse;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.service.HomeService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class HomeController {
     private final HomeService homeService;
 
     @PostMapping("/create")
-    public ApiResponse<?> createHome(@RequestBody HomeNameRequest homeNameRequest
+    public ApiResponse<String> createHome(@RequestBody HomeNameRequest homeNameRequest
             , @AuthenticationPrincipal UserDetails user
     ) {
         Home home = homeService.createHome(homeNameRequest.homeName());
@@ -34,12 +34,12 @@ public class HomeController {
     }
 
     @GetMapping("/search")
-    public ApiResponse<?> searchHome(
-            @RequestParam String title,
+    public ApiResponse<Page<HomeListResponse>> searchHome(
+            @RequestParam Long itemId,
             @RequestParam String contentType,
             @PageableDefault(size = 10) Pageable pageable) {
 
-        Page<HomeResponse> homeResponses = homeService.searchHomes(title, contentType, pageable);
+        Page<HomeListResponse> homeResponses = homeService.searchHomes(itemId, contentType, pageable);
         return ApiResponse.of(HttpStatus.OK, "success", homeResponses);
     }
 }

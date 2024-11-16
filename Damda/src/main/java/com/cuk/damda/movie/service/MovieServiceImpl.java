@@ -5,13 +5,15 @@ import com.cuk.damda.contents.domain.Enum.ItemType;
 import com.cuk.damda.contents.repository.ContentsRepository;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
+import com.cuk.damda.movie.controller.response.MovieApiResponse;
 import com.cuk.damda.movie.controller.response.MovieDetailsResponse;
 import com.cuk.damda.movie.controller.response.MovieListResponse;
 import com.cuk.damda.movie.domain.Movie;
 import com.cuk.damda.movie.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,9 +42,9 @@ public class MovieServiceImpl implements MovieService {
         Home testHome = homeRepository.findByHomeId(2L)
                 .orElseThrow(() -> new IllegalArgumentException("home을 찾을 수 없습니다."));
 
-        MovieDetailsResponse movieDetails;
+        MovieApiResponse movieDetails;
         //DB에서 movie 정보 탐색
-        Movie movieEntity = movieRepository.findByApiId(apiId);
+        Movie movieEntity = movieRepository.findByApiId(apiId).orElse(null);
 
         if(movieEntity == null){
             //없으면 api에서 정보탐색
@@ -77,6 +79,12 @@ public class MovieServiceImpl implements MovieService {
         contentsRepository.save(contents);
     }
 
+    @Override
+    public Page<MovieDetailsResponse> getMovieDetailsList(String title, Pageable pageable) {
+        Page<Movie> detailsList = movieRepository.findByTitleContains(title, pageable);
+        return detailsList.map(MovieDetailsResponse::of);
+    }
+
     /**
      * 제목으로 영화 리스트 조회(외부 api)
      * @param title
@@ -85,7 +93,7 @@ public class MovieServiceImpl implements MovieService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<MovieListResponse> getMovieList(String title, int page) {
+    public List<MovieListResponse> searchMovieList(String title, int page) {
         //API 주소
         String url = "/search/movie?query=" + title + "&language=ko-kr&page=" + page;
 
@@ -117,7 +125,7 @@ public class MovieServiceImpl implements MovieService {
      * @param apiId
      * @return
      */
-    public MovieDetailsResponse getMovieDetails(int apiId) {
+    public MovieApiResponse getMovieDetails(int apiId) {
         //API 주소 생성
         String url = "/movie/" + apiId + "?language=ko-kr&append_to_response=credits";
         //영화 정보 받아오기
@@ -181,7 +189,7 @@ public class MovieServiceImpl implements MovieService {
         }
 
         //DTO Response
-        return MovieDetailsResponse.from(title, posterPath, director, casts, genres);
+        return MovieApiResponse.from(title, posterPath, director, casts, genres);
     }
 
 
