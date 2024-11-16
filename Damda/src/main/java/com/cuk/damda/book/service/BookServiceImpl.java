@@ -2,6 +2,7 @@
 package com.cuk.damda.book.service;
 
 import com.cuk.damda.book.controller.dto.BookDetailsDto;
+import com.cuk.damda.book.controller.response.BookDetailsResponse;
 import com.cuk.damda.book.domain.Book;
 import com.cuk.damda.book.repository.BookRepository;
 import com.cuk.damda.contents.domain.Contents;
@@ -9,11 +10,15 @@ import com.cuk.damda.contents.domain.Enum.ItemType;
 import com.cuk.damda.contents.repository.ContentsRepository;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
+import com.cuk.damda.movie.controller.response.MovieDetailsResponse;
+import com.cuk.damda.movie.domain.Movie;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,6 +113,12 @@ public class BookServiceImpl implements BookService {
         }
 
         contentsRepository.save(contents);
+    }
+
+    @Override
+    public Page<BookDetailsResponse> getBookDetailsList(String title, Pageable pageable) {
+        Page<Book> detailsList = bookRepository.findByTitleContains(title, pageable);
+        return detailsList.map(BookDetailsResponse::of);
     }
 
     /**

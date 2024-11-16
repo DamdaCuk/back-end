@@ -1,5 +1,7 @@
 package com.cuk.damda.music.service;
 
+import com.cuk.damda.book.controller.response.BookDetailsResponse;
+import com.cuk.damda.book.domain.Book;
 import com.cuk.damda.contents.domain.Contents;
 import com.cuk.damda.contents.domain.Enum.ItemType;
 import com.cuk.damda.contents.repository.ContentsRepository;
@@ -19,11 +21,14 @@ import java.util.Locale;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.cuk.damda.music.controller.response.MusicDetailsResponse;
 import com.cuk.damda.music.domain.Music;
 import com.cuk.damda.music.repository.MusicRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -107,6 +112,12 @@ public class MusicServiceImpl implements MusicService {
         }
 
         contentsRepository.save(contennt);
+    }
+
+    @Override
+    public Page<MusicDetailsResponse> getMusicDetailsList(String title, Pageable pageable) {
+        Page<Music> detailsList = musicRepository.findByTitleContains(title, pageable);
+        return detailsList.map(MusicDetailsResponse::of);
     }
 
     public static List<ManiaDBDTO> parseXML(InputStream xmlStream) throws Exception {
