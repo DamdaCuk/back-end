@@ -10,10 +10,13 @@ import com.cuk.damda.contents.domain.Enum.ItemType;
 import com.cuk.damda.contents.repository.ContentsRepository;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
+import com.cuk.damda.member.domain.Member;
+import com.cuk.damda.member.repository.MemberRepository;
 import com.cuk.damda.movie.controller.response.MovieDetailsResponse;
 import com.cuk.damda.movie.domain.Movie;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +46,7 @@ public class BookServiceImpl implements BookService {
     private final HomeRepository homeRepository;
     private final BookRepository bookRepository;
     private final ContentsRepository contentsRepository;
+    private final MemberRepository memberRepository;
 
     private final String apiUrl = "https://openapi.naver.com/v1/search/book.json";
 
@@ -75,10 +79,14 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public void addBookContents(Long homeId, BookDetailsDto bookDto) {
+    public void addBookContents(BookDetailsDto bookDto, String userEmail) {
 
-        Home testHome = homeRepository.findByHomeId(homeId)
-                .orElseThrow(() -> new IllegalArgumentException("home을 찾을 수 없습니다."));
+        Member member = memberRepository.findByEmail(userEmail).
+                orElseThrow(()->new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        Home home=member.getHome();
+        if(home==null){
+            throw new IllegalArgumentException("home을 찾을 수 없습니다");
+        }
 
         //DB에 book 정보 탐색
         Book bookEntity = bookRepository.findByIsbn(bookDto.isbn()).orElse(null);
@@ -102,11 +110,11 @@ public class BookServiceImpl implements BookService {
             ItemType.BOOK,
             bookEntity.getTitle(),
             bookEntity.getImage(),
-            testHome
+            home
         );
 
         //중복 데이터 방지
-        Contents existContent = contentsRepository.findByItemIdAndHomeAndItemType(bookEntity.getBookId(), testHome, ItemType.BOOK)
+        Contents existContent = contentsRepository.findByItemIdAndHomeAndItemType(bookEntity.getBookId(), home, ItemType.BOOK)
                 .orElse(null);
         if(existContent != null) {
             throw new IllegalArgumentException("이미 저장된 컨텐츠 입니다.");

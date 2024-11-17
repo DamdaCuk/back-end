@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -28,8 +30,8 @@ public class MusicController {
     }
 
     @PostMapping
-    public ApiResponse<String> addMusic(@RequestBody ManiaDBDTO maniaDBDTO) {
-        musicService.addMusicContents(maniaDBDTO);
+    public ApiResponse<String> addMusic(@RequestBody ManiaDBDTO maniaDBDTO, @AuthenticationPrincipal UserDetails user) {
+        musicService.addMusicContents(maniaDBDTO, user.getUsername());
         return ApiResponse.of(HttpStatus.CREATED, "success");
     }
 

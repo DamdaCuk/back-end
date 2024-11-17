@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,9 +31,10 @@ public class BookController {
         return ApiResponse.ok(bookList);
     }
 
-    @PostMapping("/{homeId}")
-    public ApiResponse<String> addBook(@PathVariable("homeId") Long homeId, @RequestBody BookDetailsDto bookDetailsDto){
-        bookService.addBookContents(homeId, bookDetailsDto);
+    @PostMapping
+    public ApiResponse<String> addBook(@RequestBody BookDetailsDto bookDetailsDto, @AuthenticationPrincipal
+                                       UserDetails user) {
+        bookService.addBookContents(bookDetailsDto, user.getUsername());
         return ApiResponse.of(HttpStatus.CREATED, "success");
     }
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface BookService {
     List<BookDetailsDto> searchBookByTitle(String title, int page);
-    void addBookContents(Long homeId, BookDetailsDto bookDto);
+    void addBookContents(BookDetailsDto bookDto, String userEmail);
     Page<BookDetailsResponse> getBookDetailsList(String title, Pageable pageable);
 }
 

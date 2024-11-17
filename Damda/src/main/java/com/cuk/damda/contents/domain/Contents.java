@@ -64,6 +64,6 @@ public class Contents extends BaseEntity {
         this.review = review;
     }
     public void rating(Rating rating) {
-        this.review = review;
+        this.rating = rating;
     }
 }

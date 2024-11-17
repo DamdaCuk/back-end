@@ -10,6 +10,8 @@ import com.cuk.damda.contents.controller.request.ReviewRequest;
 import com.cuk.damda.contents.controller.response.ReviewResponse;
 import com.cuk.damda.contents.domain.Contents;
 import com.cuk.damda.contents.repository.ContentsRepository;
+import com.cuk.damda.member.domain.Member;
+import com.cuk.damda.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -26,6 +29,7 @@ import java.util.List;
 public class ContentsServiceImpl implements ContentsService {
     private final HomeRepository homeRepository;
     private final ContentsRepository contentsRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public Slice<ContentsListResponse> getContentsList(int page, int size, Long homeId, ItemType itemType) {
@@ -49,16 +53,42 @@ public class ContentsServiceImpl implements ContentsService {
     }
 
     @Override
-    public void deleteContents(Long contentsId) {
+    public void deleteContents(Long contentsId, String userEmail) {
+        Member member = memberRepository.findByEmail(userEmail).
+                orElseThrow(()->new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        Home home=member.getHome();
+        if(home==null){
+            throw new IllegalArgumentException("home을 찾을 수 없습니다.");
+        }
+
         Contents deleteContents = contentsRepository.findById(contentsId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컨텐츠입니다."));
-        contentsRepository.delete(deleteContents);
+
+        if(deleteContents.getHome()!=home){
+            throw new IllegalArgumentException("로그인 한 유저와 콘텐츠를 저장 한 유저가 다릅니다.");
+        }else {
+            contentsRepository.delete(deleteContents);
+        }
     }
+
     @Override
-    public ReviewResponse addAndUpdateReview(Long contentId, ReviewRequest reviewRequest) {
+    @Transactional
+    public ReviewResponse addAndUpdateReview(Long contentId, ReviewRequest reviewRequest, String userEmail) {
         // 1. `contentId`에 해당하는 콘텐츠 조회
         Contents content = contentsRepository.findById(contentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 콘텐츠를 찾을 수 없습니다."));
+
+        Member member = memberRepository.findByEmail(userEmail).
+                orElseThrow(()->new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        Home home=member.getHome();
+        if(home==null){
+            throw new IllegalArgumentException("home을 찾을 수 없습니다.");
+        }
+
+        Home contentHome=content.getHome();
+        if(contentHome!=home) {
+            throw new IllegalArgumentException("로그인 한 유저와 콘텐츠를 저장 한 유저가 다릅니다.");
+        }
 
         // 2. 리뷰나 평점 중 하나라도 존재하는 경우 업데이트, 둘 다 없으면 추가
         if (content.getReview() != null || content.getRating() != null) {
@@ -76,6 +106,7 @@ public class ContentsServiceImpl implements ContentsService {
         // 3. 변경사항 저장
         contentsRepository.save(content);
         return ReviewResponse.from(content.getReview(), content.getRating());
+
     }
 
     @Override
@@ -87,16 +118,28 @@ public class ContentsServiceImpl implements ContentsService {
 
 
     @Override
-    public void deleteReview(Long contentId) {
+    public void deleteReview(Long contentId, String userEmail) {
         Contents content = contentsRepository.findById(contentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 콘텐츠를 찾을 수 없습니다."));
 
-        // 리뷰와 평점 필드 초기화
-        content.review(null);
-        content.rating(null);
+        Member member = memberRepository.findByEmail(userEmail).
+                orElseThrow(()->new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        Home home=member.getHome();
+        if(home==null){
+            throw new IllegalArgumentException("home을 찾을 수 없습니다.");
+        }
 
-        // 변경된 내용을 저장
-        contentsRepository.save(content);
+        Home contentHome=content.getHome();
+        if(contentHome!=home) {
+            throw new IllegalArgumentException("로그인 한 유저와 콘텐츠를 저장 한 유저가 다릅니다.");
+        }else {
+            // 리뷰와 평점 필드 초기화
+            content.review(null);
+            content.rating(null);
+
+            // 변경된 내용을 저장
+            contentsRepository.save(content);
+        }
     }
 
 

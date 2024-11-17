@@ -10,6 +10,8 @@ import com.cuk.damda.contents.service.ContentsService;
 import com.cuk.damda.global.controller.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
@@ -33,8 +35,9 @@ public class ContentsController {
     }
 
     @PostMapping("/{contentId}/review")
-    public ApiResponse<?> addAndUpdateReview(@PathVariable Long contentId, @RequestBody ReviewRequest reviewRequest){
-        ReviewResponse reviewResponse = contentsService.addAndUpdateReview(contentId,reviewRequest);
+    public ApiResponse<?> addAndUpdateReview(@PathVariable Long contentId, @RequestBody ReviewRequest reviewRequest, @AuthenticationPrincipal
+                                             UserDetails user){
+        ReviewResponse reviewResponse = contentsService.addAndUpdateReview(contentId,reviewRequest, user.getUsername());
         return ApiResponse.of(HttpStatus.CREATED,"success", reviewResponse);
     }
 
@@ -45,14 +48,14 @@ public class ContentsController {
     }
 
     @DeleteMapping("/{contentId}/review")
-    public ApiResponse<?> deleteReview(@PathVariable Long contentId){
-        contentsService.deleteReview(contentId);
+    public ApiResponse<?> deleteReview(@PathVariable Long contentId, @AuthenticationPrincipal UserDetails user){
+        contentsService.deleteReview(contentId, user.getUsername());
         return ApiResponse.of(HttpStatus.OK, "Review and rating deleted successfully");
     }
 
     @DeleteMapping("/{contentsId}")
-    public ApiResponse<Long> deleteContents(@PathVariable Long contentsId){
-        contentsService.deleteContents(contentsId);
+    public ApiResponse<Long> deleteContents(@PathVariable Long contentsId, @AuthenticationPrincipal UserDetails user){
+        contentsService.deleteContents(contentsId, user.getUsername());
         return ApiResponse.ok(contentsId);
     }
 }
