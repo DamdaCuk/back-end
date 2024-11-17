@@ -69,6 +69,10 @@ dependencies {
 
 	//Oauth2.0
 	implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '6.3.1'
+
+	//swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
 }
 
 tasks.named('test') {
