@@ -7,6 +7,8 @@ import com.cuk.damda.contents.domain.Enum.ItemType;
 import com.cuk.damda.contents.repository.ContentsRepository;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
+import com.cuk.damda.member.domain.Member;
+import com.cuk.damda.member.repository.MemberRepository;
 import com.cuk.damda.music.controller.dto.ManiaDBDTO;
 import com.cuk.damda.music.controller.request.MusicSearchRequest;
 import java.io.InputStream;
@@ -41,7 +43,7 @@ import org.w3c.dom.NodeList;
 public class MusicServiceImpl implements MusicService {
 
     private final MusicRepository musicRepository;
-    private final HomeRepository homeRepository;
+    private final MemberRepository memberRepository;
     private final ContentsRepository contentsRepository;
 
     @Value("music.api.key")
@@ -76,12 +78,13 @@ public class MusicServiceImpl implements MusicService {
      * @param maniaDBDTO
      */
     @Override
-    public void addMusicContents(ManiaDBDTO maniaDBDTO) {
-//            Home testHome = Home.createHome("테스트홈");
-//            homeRepository.save(testHome);
-
-        Home testHome = homeRepository.findByHomeId(2L)
-                .orElseThrow(() -> new IllegalArgumentException("home을 찾을 수 없습니다."));
+    public void addMusicContents(ManiaDBDTO maniaDBDTO, String userEmail) {
+        Member member = memberRepository.findByEmail(userEmail)
+                .orElseThrow(()->new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        Home home=member.getHome();
+        if(home==null){
+            throw new IllegalArgumentException("home을 찾을 수 없습니다");
+        }
         //DB에 이미 있는지 조회
         Music music = musicRepository.findByApiId(maniaDBDTO.apiId())
                 .orElse(null);
@@ -104,9 +107,9 @@ public class MusicServiceImpl implements MusicService {
                 ItemType.MUSIC,
                 music.getTitle(),
                 music.getAlbumCover(),
-                testHome
+                home
         );
-        Contents existContent = contentsRepository.findByItemIdAndHomeAndItemType(music.getMusicId(), testHome, ItemType.MUSIC).orElse(null);
+        Contents existContent = contentsRepository.findByItemIdAndHomeAndItemType(music.getMusicId(), home, ItemType.MUSIC).orElse(null);
         if(existContent != null){
             throw new IllegalArgumentException("이미 저장된 컨텐츠 입니다.");
         }

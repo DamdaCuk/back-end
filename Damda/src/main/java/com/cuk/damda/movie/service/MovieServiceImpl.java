@@ -5,6 +5,8 @@ import com.cuk.damda.contents.domain.Enum.ItemType;
 import com.cuk.damda.contents.repository.ContentsRepository;
 import com.cuk.damda.home.domain.Home;
 import com.cuk.damda.home.repository.HomeRepository;
+import com.cuk.damda.member.domain.Member;
+import com.cuk.damda.member.repository.MemberRepository;
 import com.cuk.damda.movie.controller.response.MovieApiResponse;
 import com.cuk.damda.movie.controller.response.MovieDetailsResponse;
 import com.cuk.damda.movie.controller.response.MovieListResponse;
@@ -29,7 +31,7 @@ public class MovieServiceImpl implements MovieService {
     private final RestTemplate movieRestTemplate;
     private final MovieRepository movieRepository;
     private final ContentsRepository contentsRepository;
-    private final HomeRepository homeRepository;
+    private final MemberRepository memberRepository;
 
     /**
      * contents에 영화 등록
@@ -37,10 +39,14 @@ public class MovieServiceImpl implements MovieService {
      */
     @Override
     @Transactional
-    public void addMovieContents(int apiId) {
-        // TODO :: home 테스트 용 코드 -> 추후 수정
-        Home testHome = homeRepository.findByHomeId(2L)
-                .orElseThrow(() -> new IllegalArgumentException("home을 찾을 수 없습니다."));
+    public void addMovieContents(int apiId, String userEmail) {
+
+        Member member = memberRepository.findByEmail(userEmail)
+                .orElseThrow(()->new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        Home home=member.getHome();
+        if(home==null){
+            throw new IllegalArgumentException("home을 찾을 수 없습니다");
+        }
 
         MovieApiResponse movieDetails;
         //DB에서 movie 정보 탐색
@@ -67,11 +73,11 @@ public class MovieServiceImpl implements MovieService {
             ItemType.MOVIE,
             movieEntity.getTitle(),
             movieEntity.getPoster(),
-            testHome
+            home
         );
 
         //중복 데이터 방지
-        Contents existContent = contentsRepository.findByItemIdAndHomeAndItemType(movieEntity.getMovieId(), testHome, ItemType.MOVIE).orElse(null);
+        Contents existContent = contentsRepository.findByItemIdAndHomeAndItemType(movieEntity.getMovieId(), home, ItemType.MOVIE).orElse(null);
         if(existContent != null){
             throw new IllegalArgumentException("이미 저장된 컨텐츠 입니다.");
         }

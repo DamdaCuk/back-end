@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface MovieService {
     List<MovieListResponse> searchMovieList(String title, int page);
-    void addMovieContents(int apiId);
+    void addMovieContents(int apiId, String userEmail);
     Page<MovieDetailsResponse> getMovieDetailsList(String title, Pageable pageable);
 }
