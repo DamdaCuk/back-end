@@ -17,5 +17,5 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
     Optional<Contents> findByItemIdAndHomeAndItemType(Long itemId, Home home, ItemType itemType);
     Slice<Contents> findByHomeAndItemType(Pageable pageable, Home home, ItemType itemType);
 
-    Page<Contents> findByItemTitleAndItemType(String title, ItemType itemType, Pageable pageable);
+    Page<Contents> findByItemIdAndItemType(Long itemId, ItemType itemType, Pageable pageable);
 }
