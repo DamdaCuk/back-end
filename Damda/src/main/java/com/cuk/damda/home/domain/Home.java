@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="home_tb")
+@Table(name="home")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
