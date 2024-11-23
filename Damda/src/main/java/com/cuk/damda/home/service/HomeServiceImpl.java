@@ -36,18 +36,13 @@ public class HomeServiceImpl implements HomeService {
     @Transactional
     public void memberInsertHome(Home home, String userEmail) throws UserNotFound {
         try {
-            System.out.println(home);
-            System.out.println(homeRepository.findByHomeId(home.getHomeId()));
             Optional<Member> findMember = memberRepository.findByEmail(userEmail);
             if (findMember.isEmpty()) {
                 throw new UserNotFound();
             }
 
             Member member = findMember.get();
-            System.out.println(home);
             member.updateHome(home);
-            System.out.println(member);
-            System.out.println(member.getHome());
             memberRepository.save(member);
         }catch (Exception e) {
             e.printStackTrace();
